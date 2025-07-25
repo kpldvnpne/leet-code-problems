@@ -1,5 +1,5 @@
-mod four;
+mod p3487;
 
 fn main() {
-    println!("{}", four::Solution::find_median_sorted_arrays(vec![1, 2], vec![-1, 3]));
+    println!("{}", p3487::Solution::max_sum(vec![1, 2], vec![-1, 3]));
 }
