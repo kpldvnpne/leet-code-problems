@@ -16,7 +16,7 @@ impl Solution {
 			// This will be beyond MAX, so return just the max
 			return i32::MAX;
 		}
-		return Solution::divide_using_bitwise_operator(dividend, divisor);
+		return Solution::divide_using_subtraction(dividend, divisor);
 	}
 
 	// This is not accepted
@@ -27,20 +27,17 @@ impl Solution {
 	fn divide_using_subtraction(dividend: i32, divisor: i32) -> i32 {
 		let sign = if (dividend < 0 && divisor < 0) || (dividend >= 0) && (divisor >= 0) { 1 } else { -1 };
 
-		let neg_dividend = if dividend > 0 { -dividend } else { dividend };
-		let neg_divisor = if divisor > 0 { -divisor } else { divisor };
+		let u32_dividend = get_positive_value(dividend);
+		let u32_divisor = get_positive_value(divisor);
 
-		return sign * Solution::divide_using_substraction_both_negative(neg_dividend, neg_divisor);
+		return sign * Solution::divide_using_substraction_both_pos(u32_dividend, u32_divisor);
 	}
 
 	// This times out for dividend = 1 << 30 or 1 << 31 when divisor < 10
-	fn divide_using_substraction_both_negative(dividend: i32, divisor: i32) -> i32 {
-		assert!(dividend <= 0, "Dividend is not negative");
-		assert!(divisor <= 0, "Divisor is not negative");
-
+	fn divide_using_substraction_both_pos(dividend: u32, divisor: u32) -> i32 {
 		let mut cur_dividend = dividend;
 		let mut quotient = 0;
-		while cur_dividend <= divisor {
+		while cur_dividend >= divisor {
 			cur_dividend -= divisor;
 			quotient += 1;
 		}
