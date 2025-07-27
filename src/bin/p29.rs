@@ -10,6 +10,10 @@ fn get_positive_value(number: i32) -> u32 {
 	return number as u32;
 }
 
+fn get_first_bit(number: u32) -> u32 {
+	return (number & (1 << 31)) >> 31;
+}
+
 impl Solution {
 	pub fn divide(dividend: i32, divisor: i32) -> i32 {
 		if dividend == i32::MIN && divisor == -1 {
@@ -30,7 +34,8 @@ impl Solution {
 		let u32_dividend = get_positive_value(dividend);
 		let u32_divisor = get_positive_value(divisor);
 
-		return sign * Solution::divide_using_substraction_both_pos(u32_dividend, u32_divisor);
+		// return sign * Solution::divide_using_substraction_both_pos(u32_dividend, u32_divisor);
+		return sign * Solution::divide_using_substraction_both_pos_faster(u32_dividend, u32_divisor);
 	}
 
 	// This times out for dividend = 1 << 30 or 1 << 31 when divisor < 10
@@ -45,13 +50,38 @@ impl Solution {
 		return quotient;
 	}
 
+	fn divide_using_substraction_both_pos_faster(dividend: u32, divisor: u32) -> i32 {
+		let mut shift = 0;
+
+		// Get where to start
+		let mut cur_divisor: u32 = divisor;
+		while get_first_bit(cur_divisor) != 1 {
+			shift += 1;
+			cur_divisor = cur_divisor << 1;
+		}
+
+		let mut cur_dividend = dividend;
+		let mut quotient = 0;
+		while shift > -1 {
+			let increment = 1 << shift;
+			let cur_divisor = divisor << shift;
+			while cur_dividend >= cur_divisor {
+				cur_dividend -= cur_divisor;
+				quotient += increment;
+			}
+			shift -= 1;
+		}
+
+		return quotient as i32;
+	}
+
 	fn divide_bitwise(dividend: u32, divisor: u32) -> i32 {
 		let mut dividend = dividend;
 		let mut remainder = 0;
 		let mut quotient = 0;
 
 		for _ in 1..=32 {
-			let first_bit = (dividend & (1 << 31)) >> 31;
+			let first_bit = get_first_bit(dividend);
 			dividend = dividend << 1;
 			remainder = (remainder << 1) + first_bit;
 
@@ -122,19 +152,9 @@ mod test {
 
 	#[test]
 	fn it_doesnot_overflow_when_divisor_large() {
-		println!("{}", Solution::divide(i32::MIN, i32::MIN));
 		assert!(Solution::divide(i32::MIN, i32::MIN) == 1);
 		assert!(Solution::divide(i32::MIN, i32::MAX) == -1);
 		assert!(Solution::divide(i32::MAX, i32::MIN) == 0);
-	}
-
-	#[test]
-	fn shit_and_return_bit() {
-		let left_most_bit = 1 << 31;
-		// -5 => 5 = 0000 0000 0000 0000 0000 0000 0000 0101 => 1111 1111 1111 1111 1111 1111 1111 1011
-		// -1 => 5 = 0000 0000 0000 0000 0000 0000 0000 0001 => 1111 1111 1111 1111 1111 1111 1111 1111
-		// Perform 2's complement and get u32, then divide
-		println!("{}", left_most_bit);
 	}
 
 	#[test]
