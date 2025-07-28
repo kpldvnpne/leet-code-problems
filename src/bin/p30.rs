@@ -5,8 +5,8 @@ pub struct Solution;
 use std::collections::HashSet;
 use std::collections::HashMap;
 
-fn to_hashset(words: &Vec<String>) -> HashSet<&String> {
-  let mut set = HashSet::new();
+fn to_hashset(words: &Vec<String>) -> HashSet<&str> {
+  let mut set: HashSet<&str> = HashSet::new();
   words.iter().for_each(|word| {
     set.insert(word);
   });
@@ -14,18 +14,19 @@ fn to_hashset(words: &Vec<String>) -> HashSet<&String> {
   return set;
 }
 
-fn to_hashmap(words: &Vec<String>) -> HashMap<String, i32> {
-  let mut map = HashMap::new();
+fn to_hashmap(words: &Vec<String>) -> HashMap<&str, i32> {
+  let mut map: HashMap<&str, i32> = HashMap::new();
   words.iter().for_each(|word| {
-    map.insert(word.into(), map.get(word).unwrap_or(&0) + 1);
+    let word: &str = word;
+    map.insert(word, map.get(word).unwrap_or(&0) + 1);
   });
 
   return map;
 }
 
 
-fn substring(s: &String, start_pos: usize, len: usize) -> String {
-  return s.chars().skip(start_pos).take(len).collect();
+fn substring(s: &str, start_pos: usize, len: usize) -> &str {
+  return &s[start_pos..start_pos + len];
 }
 
 impl Solution {
@@ -93,12 +94,12 @@ impl Solution {
       for start_pos in 0..(s.len() - total_len + 1) {
         let mut map = to_hashmap(&words);
         for pos in (start_pos..(s.len() - word_size + 1)).step_by(word_size) {
-          let slice: String = substring(&s, pos, word_size);
+          let slice: &str = substring(&s, pos, word_size);
 
           let count = map.get(&slice).unwrap_or(&0i32);
           if count > &0 {
             let new_count = count - 1;
-            let slice: String = substring(&s, pos, word_size);
+            let slice: &str = substring(&s, pos, word_size);
             if new_count == 0 {
               map.remove(&slice);
             } else {
@@ -133,9 +134,9 @@ mod test {
   fn it_can_convert_to_map() {
     let words = vec!["abc".to_string(), "def".to_string(), "abc".to_string()];
 
-    let mut expected_hashmap = HashMap::new ();
-    expected_hashmap.insert(words[0].clone(), 2i32);
-    expected_hashmap.insert(words[1].clone(), 1i32);
+    let mut expected_hashmap: HashMap<&str, i32> = HashMap::new ();
+    expected_hashmap.insert(&words[0], 2i32);
+    expected_hashmap.insert(&words[1], 1i32);
 
     assert_eq!(to_hashmap(&words), expected_hashmap);
   }
