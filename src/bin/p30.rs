@@ -4,7 +4,6 @@ pub struct Solution;
 
 use std::collections::HashSet;
 use std::collections::HashMap;
-use std::collections::VecDeque;
 
 fn to_hashset(words: &Vec<String>) -> HashSet<&String> {
   let mut set = HashSet::new();
@@ -48,21 +47,19 @@ impl Solution {
 
       for offset in 0..word_size {
         let mut map = to_hashmap(words);
-        let mut words_to_remove: VecDeque<String> = VecDeque::new();
         let mut last_word_pos = offset;
 
         for word_pos in (offset..(s.len() - word_size + 1)).step_by(word_size) {
           let word = substring(s, word_pos, word_size);
 
-          while !map.contains_key(&word) && !words_to_remove.is_empty() {
+          while !map.contains_key(&word) && last_word_pos < word_pos {
+            let word_to_put_back = substring(s, last_word_pos, word_size);
             last_word_pos += word_size;
-            let word_to_put_back = words_to_remove.pop_front().unwrap();
             let count = map.get(&word_to_put_back).unwrap_or(&0);
             map.insert(word_to_put_back, count + 1);
           }
 
           if map.contains_key(&word) {
-            words_to_remove.push_back(word.clone());
             let count = map.get(&word).unwrap_or(&0);
             let new_count = count - 1;
             if new_count == 0 {
@@ -73,8 +70,8 @@ impl Solution {
 
             if map.is_empty() {
               positions.push(last_word_pos as i32);
+              let word_to_put_back = substring(s, last_word_pos, word_size);
               last_word_pos += word_size;
-              let word_to_put_back = words_to_remove.pop_front().unwrap();
               let count = map.get(&word_to_put_back).unwrap_or(&0);
               map.insert(word_to_put_back, count + 1);
             }
