@@ -2,17 +2,7 @@ fn main() {}
 
 pub struct Solution;
 
-use std::collections::HashSet;
 use std::collections::HashMap;
-
-fn to_hashset(words: &Vec<String>) -> HashSet<&str> {
-  let mut set: HashSet<&str> = HashSet::new();
-  words.iter().for_each(|word| {
-    set.insert(word);
-  });
-
-  return set;
-}
 
 fn to_hashmap(words: &Vec<String>) -> HashMap<&str, i32> {
   let mut map: HashMap<&str, i32> = HashMap::new();
@@ -45,9 +35,10 @@ impl Solution {
       }
 
       let mut positions: Vec<i32> = vec![];
+      let orig_map = to_hashmap(words);
 
       for offset in 0..word_size {
-        let mut map = to_hashmap(words);
+        let mut map: HashMap<&str, i32> = orig_map.clone();
         let mut last_word_pos = offset;
 
         for word_pos in (offset..(s.len() - word_size + 1)).step_by(word_size) {
