@@ -23,6 +23,7 @@ impl Solution {
 		return Solution::divide_using_subtraction(dividend, divisor);
 	}
 
+	#[allow(dead_code)]
 	// This is not accepted
 	fn divide_normally(dividend: i32, divisor: i32) -> i32 {
 		return dividend / divisor;
@@ -38,6 +39,7 @@ impl Solution {
 		return sign * Solution::divide_using_substraction_both_pos_faster(u32_dividend, u32_divisor);
 	}
 
+	#[allow(dead_code)]
 	// This times out for dividend = 1 << 30 or 1 << 31 when divisor < 10
 	fn divide_using_substraction_both_pos(dividend: u32, divisor: u32) -> i32 {
 		let mut cur_dividend = dividend;
@@ -75,6 +77,7 @@ impl Solution {
 		return quotient as i32;
 	}
 
+	#[allow(dead_code)]
 	fn divide_bitwise(dividend: u32, divisor: u32) -> i32 {
 		let mut dividend = dividend;
 		let mut remainder = 0;
@@ -96,6 +99,7 @@ impl Solution {
 		return quotient;
 	}
 
+	#[allow(dead_code)]
 	fn divide_using_bitwise_operator(dividend: i32, divisor: i32) -> i32 {
 		let sign = if (dividend < 0 && divisor < 0) || (dividend >= 0) && (divisor >= 0) { 1 } else { -1 };
 

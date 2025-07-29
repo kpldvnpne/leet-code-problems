@@ -1,5 +1,7 @@
 pub struct Solution;
 
+fn main() {}
+
 use std::collections::HashSet;
 
 impl Solution {

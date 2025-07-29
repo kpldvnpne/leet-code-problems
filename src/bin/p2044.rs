@@ -38,6 +38,7 @@ impl Solution {
         + Solution::dfs(bitwise_or, nums, index + 1, max_bitwise_or) ;
     }
 
+    #[allow(dead_code)]
     fn method_1(nums: &Vec<i32>) -> i32 {
       let max_bitwise_or: i32 = bitwise_or(&nums);
       let mut answer: i32 = 0;

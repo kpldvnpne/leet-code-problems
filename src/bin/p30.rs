@@ -76,6 +76,7 @@ impl Solution {
       return positions;
     }
 
+    #[allow(dead_code)]
     // This times out
     fn method_1(s: &String, words: &Vec<String>) -> Vec<i32> {
       let word_size = words[0].len();
