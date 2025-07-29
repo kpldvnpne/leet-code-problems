@@ -13,6 +13,8 @@ impl Solution {
       return Solution::method_2_from_back(&nums);
     }
 
+    // By starting from the back, we had more ground to cover. But in the other method 2, as we covered from the front
+    // we can skip once elements started repeating too much. That way, we reduce how much computation we needed to do. 
     #[allow(dead_code)]
     fn method_2_from_back(nums: &Vec<i32>) -> Vec<i32> {
       let mut residues = nums.clone();
