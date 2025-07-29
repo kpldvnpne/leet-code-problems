@@ -2,12 +2,18 @@ pub struct Solution;
 
 fn main() {}
 
-// TODO: This is currently not efficient
+// fn print_as_binary_array(arr: &[i32]) {
+//   let inner =  arr.iter().map(|it| format!("{it:b}")).collect::<Vec<String>>().join(",");
+
+//   println!("[{inner}]");
+// }
+
 impl Solution {
     pub fn smallest_subarrays(nums: Vec<i32>) -> Vec<i32> {
       return Solution::method_2_sliding_window(&nums);
     }
 
+    // Only beats 57% code in complexity and 7% code in memory usage
     fn method_2_sliding_window(nums: &Vec<i32>) -> Vec<i32> {
       let mut max_bitwise_ors = vec![0; nums.len()];
 
@@ -25,16 +31,19 @@ impl Solution {
 
       for (num_i, num) in nums.iter().enumerate() {
         rolling_bitwise_or = rolling_bitwise_or | num;
+        // println!("i={num_i}; num={num:b}; bitwise_or={rolling_bitwise_or:b}");
         for residue_i in residue_update_start..num_i {
           let residue = residues[residue_i];
           let new_residue = residue ^ (residue & num);
           residues[residue_i] = new_residue;
 
           // If 0, no need to keep updating
-          if new_residue == 0 {
+          if new_residue == 0 && residue_i == residue_update_start {
             residue_update_start += 1;
           }
         }
+
+        // print_as_binary_array(&residues[0..(num_i+1)]);
 
         while (answer_i <= num_i) && (rolling_bitwise_or == max_bitwise_ors[answer_i])  {
           let answer = (num_i - answer_i + 1) as i32;
@@ -114,10 +123,16 @@ mod test {
   #[test]
   fn it_works_for_a_failing_test() {
     let nums = vec![76,57,77,64,41,82,34,57,94,33,87,24,17,54,11,10,18,70,80,37,18,5,11,71,0,29,90,45,25,64,64,32,3,67,78,4,98,2,50,100,9,97,48,47,23,28,25,45,56,37,30,72,57,58,39,89,78,13,76,40,44,79,41,99,24,7,86,23,42,58,34,14,11,26];
-    let expected_answer = vec![6,5,4,6,5,4,3,2,2,3,4,7,6,5,6,5,7,6,5,5,8,7,6,5,4,3,2,6,7,10,9,8,7,6,7,6,5,4,3,5,4,3,10,9,8,7,6,5,4,3,3,4,4,3,2,5,9,8,7,6,5,4,4,3,5,4,3,2,5,4,4,3,2,1];
-    let real_answer = Solution::smallest_subarrays(nums);
+    let expected_answers = vec![6,5,4,6,5,4,3,2,2,3,4,7,6,5,6,5,7,6,5,5,8,7,6,5,4,3,2,6,7,10,9,8,7,6,7,6,5,4,3,5,4,3,10,9,8,7,6,5,4,3,3,4,4,3,2,5,9,8,7,6,5,4,4,3,5,4,3,2,5,4,4,3,2,1];
+    let real_answers = Solution::smallest_subarrays(nums);
 
-    assert_eq!(real_answer, expected_answer);
+    for i in 0..(expected_answers.len()) {
+      if real_answers[i] != expected_answers[i] {
+        println!("{}: {}\t{}", i, real_answers[i], expected_answers[i]);
+      }
+    }
+
+    assert_eq!(real_answers, expected_answers);
   }
 
   fn read_vec_from_file(path: &str) -> Vec<i32> {
