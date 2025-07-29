@@ -110,4 +110,33 @@ mod test {
 
     assert_eq!(Solution::smallest_subarrays(nums), answer);
   }
+
+  #[test]
+  fn it_works_for_a_failing_test() {
+    let nums = vec![76,57,77,64,41,82,34,57,94,33,87,24,17,54,11,10,18,70,80,37,18,5,11,71,0,29,90,45,25,64,64,32,3,67,78,4,98,2,50,100,9,97,48,47,23,28,25,45,56,37,30,72,57,58,39,89,78,13,76,40,44,79,41,99,24,7,86,23,42,58,34,14,11,26];
+    let expected_answer = vec![6,5,4,6,5,4,3,2,2,3,4,7,6,5,6,5,7,6,5,5,8,7,6,5,4,3,2,6,7,10,9,8,7,6,7,6,5,4,3,5,4,3,10,9,8,7,6,5,4,3,3,4,4,3,2,5,9,8,7,6,5,4,4,3,5,4,3,2,5,4,4,3,2,1];
+    let real_answer = Solution::smallest_subarrays(nums);
+
+    assert_eq!(real_answer, expected_answer);
+  }
+
+  fn read_vec_from_file(path: &str) -> Vec<i32> {
+    use std::fs;
+
+    let contents = fs::read_to_string(path).expect("Should have been able to read the file");
+
+    let vec: Vec<i32> = contents.trim().split(",").map(|it| {
+      it.parse::<i32>().unwrap()
+    }).collect();
+
+    return vec;
+  }
+
+  #[test]
+  fn it_works_for_large_sized_nums() {
+    let nums = read_vec_from_file("/Users/kapildev/Documents/rust-leetcode/src/bin/p2411_large_input.txt");
+
+    Solution::smallest_subarrays(nums);
+  }
+
 }
