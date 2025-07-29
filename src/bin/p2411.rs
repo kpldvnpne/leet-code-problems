@@ -10,11 +10,11 @@ fn main() {}
 
 impl Solution {
     pub fn smallest_subarrays(nums: Vec<i32>) -> Vec<i32> {
-      return Solution::method_2_from_back(&nums);
+      return Solution::method_2_sliding_window(&nums);
     }
 
     // By starting from the back, we had more ground to cover. But in the other method 2, as we covered from the front
-    // we can skip once elements started repeating too much. That way, we reduce how much computation we needed to do. 
+    // we can skip once elements started repeating too much. That way, we reduce how much computation we needed to do.
     #[allow(dead_code)]
     fn method_2_from_back(nums: &Vec<i32>) -> Vec<i32> {
       let mut residues = nums.clone();
@@ -177,6 +177,40 @@ mod test {
   #[test]
   fn it_works_for_large_sized_nums() {
     let nums = read_vec_from_file("/Users/kapildev/Documents/rust-leetcode/src/bin/p2411_large_input.txt");
+
+    Solution::smallest_subarrays(nums);
+  }
+
+  // Here, this not working but the next one working means that Leetcode only optimized for the cases where
+  // the previous elements could be forgotten. I pointed out a case where it would not work out.
+  fn get_custom_large_input() -> Vec<i32> {
+    let mut array = vec![14];
+    let mut middle = [12, 8].repeat((10_000 - 2) / 2);
+    array.append(&mut middle);
+    array.append(&mut vec![15]);
+
+    return array;
+  }
+
+  #[test]
+  fn it_works_for_custom_large_size_nums() {
+    let nums = get_custom_large_input();
+
+    Solution::smallest_subarrays(nums);
+  }
+
+  fn get_leetcodes_large_input() -> Vec<i32> {
+    let mut array = vec![];
+    let mut middle = [1, 2].repeat((100_000 - 2) / 2);
+    array.append(&mut middle);
+    array.append(&mut vec![1, 4]);
+
+    return array;
+  }
+
+  #[test]
+  fn it_works_for_leetcodes_large_sized_nums() {
+    let nums = get_leetcodes_large_input();
 
     Solution::smallest_subarrays(nums);
   }
