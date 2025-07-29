@@ -2,8 +2,53 @@ pub struct Solution;
 
 fn main() {}
 
+// TODO: This is currently not efficient
 impl Solution {
     pub fn smallest_subarrays(nums: Vec<i32>) -> Vec<i32> {
+      return Solution::method_2_sliding_window(&nums);
+    }
+
+    fn method_2_sliding_window(nums: &Vec<i32>) -> Vec<i32> {
+      let mut max_bitwise_ors = vec![0; nums.len()];
+
+      let mut bitwise_or = 0;
+      for (num_i, num) in nums.iter().enumerate().rev() {
+        bitwise_or = bitwise_or | num;
+        max_bitwise_ors[num_i] = bitwise_or;
+      }
+
+      let mut residues = nums.clone();
+      let mut residue_update_start: usize = 0; // Once 0, no need to keep updating
+      let mut answers: Vec<i32> = vec![0; nums.len()];
+      let mut answer_i: usize = 0;
+      let mut rolling_bitwise_or = 0;
+
+      for (num_i, num) in nums.iter().enumerate() {
+        rolling_bitwise_or = rolling_bitwise_or | num;
+        for residue_i in residue_update_start..num_i {
+          let residue = residues[residue_i];
+          let new_residue = residue ^ (residue & num);
+          residues[residue_i] = new_residue;
+
+          // If 0, no need to keep updating
+          if new_residue == 0 {
+            residue_update_start += 1;
+          }
+        }
+
+        while (answer_i <= num_i) && (rolling_bitwise_or == max_bitwise_ors[answer_i])  {
+          let answer = (num_i - answer_i + 1) as i32;
+          answers[answer_i] = answer;
+          rolling_bitwise_or = rolling_bitwise_or ^ residues[answer_i];
+          answer_i += 1;
+        }
+      }
+
+      return answers;
+    }
+
+    #[allow(dead_code)]
+    fn method_1_slow(nums: &Vec<i32>) -> Vec<i32> {
       let mut answers: Vec<i32> = vec![0; nums.len()];
       let mut max_bitwise_ors = vec![0; nums.len()];
 
