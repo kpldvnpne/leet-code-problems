@@ -8,15 +8,39 @@ fn main() {}
 //   println!("[{inner}]");
 // }
 
+fn is_bit_on(num: i32, bit_i: usize) -> bool {
+  return (num & (1 << bit_i)) > 0;
+}
+
 impl Solution {
     pub fn smallest_subarrays(nums: Vec<i32>) -> Vec<i32> {
-      return Solution::method_2_sliding_window(&nums);
+      return Solution::method_4_leetcode_official_solution(&nums);
+    }
+
+    fn method_4_leetcode_official_solution(nums: &Vec<i32>) -> Vec<i32> {
+      let mut bit_positions: [i32; 32] = [-1; 32];
+      let mut answers = vec![0; nums.len()];
+
+      for (num_i, num) in nums.iter().enumerate().rev() {
+        let num_i = num_i as i32;
+        for bit_i in 0..32 {
+          if is_bit_on(*num, bit_i) {
+            bit_positions[bit_i] = num_i;
+          }
+        }
+
+        let max = *bit_positions.iter().max().unwrap();
+        let answer = if max == -1 { 1 } else { max - num_i + 1 };
+        answers[num_i as usize] = answer;
+      }
+
+      return answers;
     }
 
     // By starting from the back, we had more ground to cover. But in the other method 2, as we covered from the front
     // we can skip once elements started repeating too much. That way, we reduce how much computation we needed to do.
     #[allow(dead_code)]
-    fn method_2_from_back(nums: &Vec<i32>) -> Vec<i32> {
+    fn method_3_from_back(nums: &Vec<i32>) -> Vec<i32> {
       let mut residues = nums.clone();
       let mut residue_end = nums.len();
       let mut answers: Vec<i32> = vec![0; nums.len()];
@@ -115,6 +139,17 @@ mod test {
   use super::*;
 
   #[test]
+  fn is_bit_on_works() {
+    assert_eq!(is_bit_on(1, 0), true);
+    assert_eq!(is_bit_on(2, 1), true);
+    assert_eq!(is_bit_on(4, 2), true);
+    assert_eq!(is_bit_on(8, 3), true);
+
+    assert_eq!(is_bit_on(3, 2), false);
+    assert_eq!(is_bit_on(7, 3), false);
+  }
+
+  #[test]
   fn the_vec_dynamic_init_works() {
     let mut len = 0;
     len += 5;
@@ -141,8 +176,8 @@ mod test {
 
   #[test]
   fn it_works_when_last_element_is_zero() {
-    let nums = vec![1, 0];
-    let answer = vec![1, 1];
+    let nums = vec![1, 0, 0];
+    let answer = vec![1, 1, 1];
 
     assert_eq!(Solution::smallest_subarrays(nums), answer);
   }
