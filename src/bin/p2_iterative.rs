@@ -1,4 +1,6 @@
-// Better than 100% of the code out there.
+pub struct Solution {}
+
+fn main() {}
 
 // Definition for singly-linked list.
 #[derive(PartialEq, Eq, Clone, Debug)]
@@ -16,8 +18,6 @@ impl ListNode {
     }
   }
 }
-
-struct Solution {}
 
 impl Solution {
     fn get_val_or_zero(option_node: &Option<Box<ListNode>>) -> i32 {

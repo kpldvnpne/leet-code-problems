@@ -1,5 +1,9 @@
 // Better than 100% of the code out there.
 
+pub struct Solution;
+
+fn main() {}
+
 use std::collections::HashMap;
 
 impl Solution {
