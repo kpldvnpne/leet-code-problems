@@ -10,9 +10,34 @@ fn main() {}
 
 impl Solution {
     pub fn smallest_subarrays(nums: Vec<i32>) -> Vec<i32> {
-      return Solution::method_2_sliding_window(&nums);
+      return Solution::method_2_from_back(&nums);
     }
 
+    #[allow(dead_code)]
+    fn method_2_from_back(nums: &Vec<i32>) -> Vec<i32> {
+      let mut residues = nums.clone();
+      let mut residue_end = nums.len();
+      let mut answers: Vec<i32> = vec![0; nums.len()];
+
+      for (num_i, num) in nums.iter().enumerate().rev() {
+        for residue_i in ((num_i+1)..residue_end).rev() {
+          let residue = residues[residue_i];
+          let new_residue = residue ^ (residue & num);
+          residues[residue_i] = new_residue;
+
+          if new_residue == 0 && residue_i == (residue_end - 1) {
+            residue_end -= 1;
+          }
+        }
+
+        let answer = residue_end - num_i;
+        answers[num_i] = answer as i32;
+      }
+
+      return answers;
+    }
+
+    #[allow(dead_code)]
     // Only beats 57% code in complexity and 7% code in memory usage
     fn method_2_sliding_window(nums: &Vec<i32>) -> Vec<i32> {
       let mut max_bitwise_ors = vec![0; nums.len()];
