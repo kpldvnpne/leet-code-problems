@@ -2,6 +2,7 @@ pub struct Solution;
 
 fn main() {}
 
+// TODO: Didn't beat everybody
 fn bitwise_or(nums: &Vec<i32>) -> i32 {
   assert!(nums.len() > 0);
   let mut acc = 0;
@@ -13,6 +14,31 @@ fn bitwise_or(nums: &Vec<i32>) -> i32 {
 
 impl Solution {
     pub fn count_max_or_subsets(nums: Vec<i32>) -> i32 {
+      return Solution::method_2(&nums);
+    }
+
+    fn method_2(nums: &Vec<i32>) -> i32 {
+      let max_bitwise_or = bitwise_or(nums);
+
+      return Solution::dfs(&0, nums, 0, &max_bitwise_or);
+    }
+
+    // It is faster because we are caching bitwise_or
+    // It could be made faster with stack instead of recursion.
+    fn dfs(bitwise_or: &i32, nums: &Vec<i32>, index: usize, max_bitwise_or: &i32) -> i32 {
+      if index == nums.len() {
+        if bitwise_or == max_bitwise_or {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+
+      return Solution::dfs(&(bitwise_or | nums[index]), nums, index + 1, max_bitwise_or)
+        + Solution::dfs(bitwise_or, nums, index + 1, max_bitwise_or) ;
+    }
+
+    fn method_1(nums: &Vec<i32>) -> i32 {
       let max_bitwise_or: i32 = bitwise_or(&nums);
       let mut answer: i32 = 0;
 
