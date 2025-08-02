@@ -15,6 +15,11 @@ mod test {
   fn case_2() {
     assert_eq!(Solution::min_cost(vec![2, 3, 4, 1], vec![3, 2, 5, 1]), -1);
   }
+
+  #[test]
+  fn case_3() {
+    assert_eq!(Solution::min_cost(vec![4, 4, 4, 4, 3], vec![5, 5, 5, 5, 3]), 8);
+  }
 }
 
 use std::collections::HashMap;
@@ -33,8 +38,6 @@ impl Default for Link {
     };
   }
 }
-
-
 
 impl Solution {
     pub fn min_cost(basket1: Vec<i32>, basket2: Vec<i32>) -> i64 {
@@ -83,18 +86,19 @@ impl Solution {
         }
         let list_to_look = if diff > 0 { &link.upper.clone() } else { &link.lower.clone() };
         let swaps_needed: i32 = i32::abs(diff) / 2;
-
-        total_cost += (swaps_needed * key) as i64;
+        let cost = (swaps_needed as i64) * (key as i64);
+        total_cost += cost;
 
         for i in 0..(swaps_needed as usize) {
           let other_number = list_to_look[i];
           let other_link = links.get_mut(&other_number).unwrap();
           if diff > 0 {
-            let _: i32 = other_link.lower.pop_back().unwrap();
+            let popped: i32 = other_link.lower.pop_back().unwrap();
+            other_link.upper.push_back(popped);
             // assert_eq!(popped, other_number);
           } else {
-            let _ = other_link.upper.pop_back().unwrap();
-            // assert_eq!(popped, other_number);
+            let popped = other_link.upper.pop_back().unwrap();
+            other_link.lower.push_back(popped);
           }
         }
       }
