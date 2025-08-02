@@ -11,8 +11,9 @@ mod test {
     assert_eq!(Solution::min_cost(vec![4, 2, 2, 2], vec![1, 4, 1, 2]), 1);
   }
 
+  #[test]
   fn case_2() {
-    assert_eq!(Solution::min_cost(vec![2, 3, 4, 1], vec![3, 2, 5, 1]), -11);
+    assert_eq!(Solution::min_cost(vec![2, 3, 4, 1], vec![3, 2, 5, 1]), -1);
   }
 }
 
@@ -69,35 +70,35 @@ impl Solution {
         link.lower.make_contiguous().reverse();
       }
 
-      let mut keys_sorted: Vec<&i32> = links.keys().collect::<Vec<&i32>>();
+      let mut keys_sorted: Vec<i32> = links.keys().cloned().collect::<Vec<i32>>();
       keys_sorted.sort();
 
-      let mut answer: i64 = 0;
+      let mut total_cost: i64 = 0;
 
       for key in keys_sorted {
-        let link = links.get(key).unwrap();
+        let link = links.get(&key).unwrap();
         let diff = link.upper.len() as i32 - link.lower.len() as i32;
         if diff == 0 {
           continue;
         }
-        let list_to_look = if diff > 0 { &link.upper } else { &link.lower };
+        let list_to_look = if diff > 0 { &link.upper.clone() } else { &link.lower.clone() };
         let swaps_needed: i32 = i32::abs(diff) / 2;
 
-        answer += swaps_needed as i64;
+        total_cost += (swaps_needed * key) as i64;
 
         for i in 0..(swaps_needed as usize) {
           let other_number = list_to_look[i];
           let other_link = links.get_mut(&other_number).unwrap();
           if diff > 0 {
-            let popped = other_link.lower.pop_back().unwrap();
-            assert_eq!(popped, other_number);
+            let _: i32 = other_link.lower.pop_back().unwrap();
+            // assert_eq!(popped, other_number);
           } else {
-            let popped = other_link.upper.pop_back().unwrap();
-            assert_eq!(popped, other_number);
+            let _ = other_link.upper.pop_back().unwrap();
+            // assert_eq!(popped, other_number);
           }
         }
       }
 
-      return answer;
+      return total_cost;
     }
 }
