@@ -20,6 +20,11 @@ mod test {
   fn case_3() {
     assert_eq!(Solution::min_cost(vec![4, 4, 4, 4, 3], vec![5, 5, 5, 5, 3]), 8);
   }
+
+  #[test]
+  fn case_4() {
+    Solution::min_cost(vec![84,80,43,8,80,88,43,14,100,88], vec![32,32,42,68,68,100,42,84,14,8]);
+  }
 }
 
 use std::collections::HashMap;
@@ -37,6 +42,12 @@ impl Default for Link {
       lower: VecDeque::new(),
     };
   }
+}
+
+fn sort_descending<T: Ord>(deque: VecDeque<T>) -> VecDeque<T> {
+    let mut vec: Vec<T> = deque.into_iter().collect();
+    vec.sort_by(|a, b| b.cmp(a)); // Descending order
+    vec.into_iter().collect()
 }
 
 impl Solution {
@@ -69,12 +80,18 @@ impl Solution {
       }
 
       for link in links.values_mut() {
-        link.upper.make_contiguous().reverse();
-        link.lower.make_contiguous().reverse();
+        link.upper = sort_descending(link.upper.clone());
+        link.lower = sort_descending(link.lower.clone());
       }
 
       let mut keys_sorted: Vec<i32> = links.keys().cloned().collect::<Vec<i32>>();
       keys_sorted.sort();
+
+      // for key in &keys_sorted {
+      //   let link = links.get(key).unwrap();
+      //   println!("{key}: {:?}", link.upper);
+      //   println!("{key}: {:?}", link.lower);
+      // }
 
       let mut total_cost: i64 = 0;
 
@@ -90,6 +107,7 @@ impl Solution {
         total_cost += cost;
 
         for i in 0..(swaps_needed as usize) {
+          // println!("{key}; {list_to_look:?}");
           let other_number = list_to_look[i];
           let other_link = links.get_mut(&other_number).unwrap();
           if diff > 0 {
