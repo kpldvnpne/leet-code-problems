@@ -15,13 +15,38 @@ mod test {
   fn case_2() {
     assert_eq!(Solution::subarray_bitwise_o_rs(vec![1, 1, 2]), 3);
   }
+
+  #[test]
+  fn case_3() {
+    assert_eq!(Solution::subarray_bitwise_o_rs(vec![1, 2, 4]), 6);
+  }
 }
 
 use std::collections::HashSet;
 
 impl Solution {
     pub fn subarray_bitwise_o_rs(arr: Vec<i32>) -> i32 {
-      return Solution::second_way(&arr);
+      return Solution::best_approach(&arr);
+    }
+
+    fn best_approach(arr: &Vec<i32>) -> i32 {
+      let mut current_ors: HashSet<i32> = HashSet::new();
+      let mut all_items: HashSet<i32> = HashSet::new();
+
+      for item in arr {
+        let item = *item;
+        let mut next_ors: HashSet<i32> = HashSet::new();
+        next_ors.insert(item);
+        for or in current_ors {
+          next_ors.insert(or | item);
+        }
+
+        all_items.extend(next_ors.iter());
+
+        current_ors = next_ors;
+      }
+
+      return all_items.len() as i32;
     }
 
     #[allow(dead_code)]
