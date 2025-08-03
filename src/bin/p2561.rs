@@ -29,6 +29,7 @@ mod test {
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
+use std::cell::RefCell;
 
 #[derive(Clone, Copy)]
 struct PositionedItem {
@@ -80,26 +81,26 @@ impl Default for Link {
 
 impl Solution {
     pub fn min_cost(basket1: Vec<i32>, basket2: Vec<i32>) -> i64 {
-      let mut links: BTreeMap<i32, Link> = BTreeMap::new();
+      let mut links: BTreeMap<i32, RefCell<Link>> = BTreeMap::new();
       for i in 0..(basket1.len()) {
         let a = basket1[i];
         let b = basket2[i];
 
         if !links.contains_key(&a) {
-          links.insert(a, Link::default());
+          links.insert(a, RefCell::new(Link::default()));
         }
 
         if !links.contains_key(&b) {
-          links.insert(b, Link::default());
+          links.insert(b, RefCell::new(Link::default()));
         }
 
-        let link: &mut Link = links.get_mut(&a).unwrap();
+        let mut link = links.get(&a).unwrap().borrow_mut();
         link.from_upper.insert(PositionedItem{
           item: b,
           position: i,
         });
 
-        let link: &mut Link = links.get_mut(&b).unwrap();
+        let mut link = links.get(&b).unwrap().borrow_mut();
         link.from_lower.insert(PositionedItem {
           item: a,
           position: i,
@@ -107,6 +108,7 @@ impl Solution {
       }
 
       for (key, link) in links.iter() {
+        let link = link.borrow();
         let total_len = link.from_upper.len() + link.from_lower.len();
         if total_len % 2 != 0 {
           println!("{key}, {total_len}");
@@ -118,42 +120,34 @@ impl Solution {
       let mut new_basket2 = basket2.clone();
 
       for key in links.keys() {
-        let link = links.get_mut(key).unwrap();
+        let mut link = links.get(key).unwrap().borrow_mut();
         let diff = link.from_upper.len() as i32 - link.from_lower.len() as i32;
         let to_change_count = (diff.abs() / 2) as usize;
 
-        let source;
-        let dest;
-        if diff > 0 {
-          source = &mut link.from_upper;
-          dest = &mut link.from_lower;
-        } else {
-          source = &mut link.from_lower;
-          dest = &mut link.from_upper;
-        }
+        let source = if diff > 0 { link.from_upper.clone() } else { link.from_lower.clone() };
 
-        for item in source.clone().iter().rev().take(to_change_count) {
-          source.remove(item);
-          dest.insert(*item);
+        for item in source.iter().rev().take(to_change_count) {
+          if diff > 0 {
+            link.from_upper.remove(item);
+            link.from_lower.insert(*item);
+          } else {
+            link.from_lower.remove(item);
+            link.from_upper.insert(*item);
+          }
 
           let item_for_other = PositionedItem {
             item: *key,
             position: item.position
           };
 
-          let other_linked = links.get_mut(&item.item).unwrap();
-          let other_source;
-          let other_dest;
+          let mut other_linked = links.get(&item.item).unwrap().borrow_mut();
           if diff > 0 {
-            other_source = &mut other_linked.from_lower;
-            other_dest = &mut other_linked.from_upper;
+            other_linked.from_lower.remove(&item_for_other);
+            other_linked.from_upper.insert(item_for_other);
           } else {
-            other_source = &mut other_linked.from_upper;
-            other_dest = &mut other_linked.from_lower;
+            other_linked.from_upper.remove(&item_for_other);
+            other_linked.from_lower.insert(item_for_other);
           }
-
-          other_source.remove(&item_for_other);
-          other_dest.insert(item_for_other);
 
           // Swap in the basket
           let position = item.position;
