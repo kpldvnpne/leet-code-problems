@@ -24,6 +24,7 @@ impl Solution {
       return Solution::second_way(&arr);
     }
 
+    #[allow(dead_code)]
     fn second_way(arr: &Vec<i32>) -> i32 {
       let mut set: HashSet<i32> = HashSet::new();
       let mut residues = vec![];
@@ -38,7 +39,7 @@ impl Solution {
           residues[residue_i] = new_residue;
           set.insert(new_residue);
 
-          if residue_i > residue_start {
+          if residue_i == residue_start + 1 {
             let prev_residue = residues[residue_i - 1] ;
             if new_residue == prev_residue {
               residue_start = residue_i;
@@ -51,6 +52,7 @@ impl Solution {
       return set.len() as i32;
     }
 
+    // Only 77 / 85 test cases passed
     #[allow(dead_code)]
     fn simple_way(arr: &Vec<i32>) -> i32 {
       let mut set: HashSet<i32> = HashSet::new();
