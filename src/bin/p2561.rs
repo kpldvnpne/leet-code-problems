@@ -31,7 +31,7 @@ use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::cell::RefCell;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct PositionedItem {
   item: i32,
   position: usize,
@@ -159,20 +159,36 @@ impl Solution {
         }
       }
 
-      println!("{new_basket1:?}");
-      println!("{new_basket2:?}");
+      // println!("{new_basket1:?}");
+      // println!("{new_basket2:?}");
 
-      let mut answer: i64 = 0;
+      let mut answer1: i64 = 0;
+
       for i in 0..new_basket1.len() {
         if new_basket1[i] != basket1[i] {
           // assert!(new_basket2[i] != new_basket2[i]);
           assert!(new_basket1[i] == basket2[i]);
           assert!(new_basket2[i] == basket1[i]);
 
-          answer += std::cmp::min(new_basket1[i], new_basket2[i]) as i64;
+          answer1 += std::cmp::min(new_basket1[i], new_basket2[i]) as i64;
         }
       }
 
-      return answer;
+      let temp = &new_basket1;
+      let new_basket1 = &new_basket2;
+      let new_basket2 = temp;
+
+      let mut answer2: i64 = 0;
+      for i in 0..new_basket1.len() {
+        if new_basket1[i] != basket1[i] {
+          // assert!(new_basket2[i] != new_basket2[i]);
+          assert!(new_basket1[i] == basket2[i]);
+          assert!(new_basket2[i] == basket1[i]);
+
+          answer2 += std::cmp::min(new_basket1[i], new_basket2[i]) as i64;
+        }
+      }
+
+      return std::cmp::min(answer1, answer2);
     }
 }
