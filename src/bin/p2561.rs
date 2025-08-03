@@ -94,14 +94,16 @@ impl Solution {
           links.insert(b, RefCell::new(Link::default()));
         }
 
-        let mut link = links.get(&a).unwrap().borrow_mut();
-        link.from_upper.insert(PositionedItem{
+        let mut link_a = links.get(&a).unwrap().borrow_mut();
+        link_a.from_upper.insert(PositionedItem{
           item: b,
           position: i,
         });
 
-        let mut link = links.get(&b).unwrap().borrow_mut();
-        link.from_lower.insert(PositionedItem {
+        drop(link_a);
+
+        let mut link_b = links.get(&b).unwrap().borrow_mut();
+        link_b.from_lower.insert(PositionedItem {
           item: a,
           position: i,
         });
@@ -156,6 +158,9 @@ impl Solution {
           new_basket2[position] = temp;
         }
       }
+
+      println!("{new_basket1:?}");
+      println!("{new_basket2:?}");
 
       let mut answer: i64 = 0;
       for i in 0..new_basket1.len() {
