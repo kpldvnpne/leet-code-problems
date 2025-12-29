@@ -51,7 +51,7 @@ struct Checkpoint<'a> {
   row_i: usize,
   col_i: usize,
   next_layer: String,
-  possible_next: &'a [&'a str],
+  possible_next: &'a[char],
 }
 
 impl Solution {
@@ -60,12 +60,13 @@ impl Solution {
         return false;
       }
 
-      let mut map: HashMap<&str, Vec<&str>> = HashMap::new();
+      let mut map: HashMap<(char, char), Vec<char>> = HashMap::new();
       for item in allowed.iter() {
-        let key: &str = &item[0..=1];
-        let value: &str = &item[2..=2];
+        let first: char = item.chars().nth(0).unwrap();
+        let second = item.chars().nth(1).unwrap();
+        let third = item.chars().nth(2).unwrap();
 
-        map.entry(key).or_insert(vec![]).push(value);
+        map.entry((first, second)).or_insert(vec![]).push(third);
       }
 
       let mut pyramid = vec![bottom];
@@ -74,8 +75,9 @@ impl Solution {
       let mut next_layer: String = "".to_string();
       let mut checkpoints: Vec<Checkpoint> = vec![];
       loop {
-        let key = &pyramid[row_i][col_i..=(col_i+1)];
-        if let Some(possible_next) = map.get(key) {
+        let first = pyramid[row_i].chars().nth(col_i).unwrap();
+        let second = pyramid[row_i].chars().nth(col_i+1).unwrap();
+        if let Some(possible_next) = map.get(&(first, second)) {
           // Explore all possibilities
           if possible_next.len() > 1 {
             checkpoints.push(Checkpoint {
@@ -87,7 +89,7 @@ impl Solution {
             });
           }
 
-          next_layer.push_str(possible_next[0]);
+          next_layer.push(possible_next[0]);
           // for item in pyramid.iter() {
           //   println!("{}", item);
           // }
@@ -107,7 +109,7 @@ impl Solution {
                 ..checkpoint
               });
             }
-            next_layer.push_str(checkpoint.possible_next[0]);
+            next_layer.push(checkpoint.possible_next[0]);
 
             // println!("Trying next, current pyramid is");
             // for item in pyramid.iter() {
