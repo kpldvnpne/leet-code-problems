@@ -47,7 +47,7 @@ fn min_allowed_required(bottom: &str) -> u32 {
 }
 
 struct Checkpoint<'a> {
-  pyramid: Vec<String>,
+  current_layer: String,
   row_i: usize,
   col_i: usize,
   next_layer: String,
@@ -69,19 +69,19 @@ impl Solution {
         map.entry((first, second)).or_insert(vec![]).push(third);
       }
 
-      let mut pyramid = vec![bottom];
+      let mut current_layer = bottom;
       let mut row_i = 0;
       let mut col_i = 0;
       let mut next_layer: String = "".to_string();
       let mut checkpoints: Vec<Checkpoint> = vec![];
       loop {
-        let first = pyramid[row_i].chars().nth(col_i).unwrap();
-        let second = pyramid[row_i].chars().nth(col_i+1).unwrap();
+        let first = current_layer.chars().nth(col_i).unwrap();
+        let second = current_layer.chars().nth(col_i+1).unwrap();
         if let Some(possible_next) = map.get(&(first, second)) {
           // Explore all possibilities
           if possible_next.len() > 1 {
             checkpoints.push(Checkpoint {
-              pyramid: pyramid.clone(),
+              current_layer: current_layer.clone(),
               row_i: row_i,
               col_i: col_i,
               next_layer: next_layer.clone(),
@@ -99,7 +99,7 @@ impl Solution {
           // println!("Could not find for {}", key);
           // Not possible
           if let Some(checkpoint) = checkpoints.pop() {
-            pyramid = checkpoint.pyramid.clone();
+            current_layer = checkpoint.current_layer.clone();
             row_i = checkpoint.row_i;
             col_i = checkpoint.col_i;
             next_layer = checkpoint.next_layer.clone();
@@ -124,14 +124,14 @@ impl Solution {
         }
 
         col_i += 1;
-        if col_i + 1 == pyramid[row_i].len() {
+        if col_i + 1 == current_layer.len() {
           if col_i == 1 {
             // println!("Returning true");
             return true;
           }
           col_i = 0;
           row_i += 1;
-          pyramid.push(next_layer);
+          current_layer = next_layer;
           next_layer = String::from("");
         }
       }
