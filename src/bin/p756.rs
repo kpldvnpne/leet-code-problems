@@ -46,12 +46,12 @@ fn min_allowed_required(bottom: &str) -> u32 {
   sum_upto((l - 1) as u32)
 }
 
-struct Checkpoint {
+struct Checkpoint<'a> {
   pyramid: Vec<String>,
   row_i: usize,
   col_i: usize,
   next_layer: String,
-  possible_next: String,
+  possible_next: &'a [&'a str],
 }
 
 impl Solution {
@@ -78,16 +78,13 @@ impl Solution {
         if let Some(possible_next) = map.get(key) {
           // Explore all possibilities
           if possible_next.len() > 1 {
-            let mut new_checkpoints: Vec<Checkpoint> = possible_next[1..].iter().map(|n| {
-              Checkpoint {
-                pyramid: pyramid.clone(),
-                row_i: row_i,
-                col_i: col_i,
-                next_layer: next_layer.clone(),
-                possible_next: n.to_string(),
-              }
-            }).collect();
-            checkpoints.append(&mut new_checkpoints);
+            checkpoints.push(Checkpoint {
+              pyramid: pyramid.clone(),
+              row_i: row_i,
+              col_i: col_i,
+              next_layer: next_layer.clone(),
+              possible_next: &possible_next[1..],
+            });
           }
 
           next_layer.push_str(possible_next[0]);
@@ -100,11 +97,17 @@ impl Solution {
           // println!("Could not find for {}", key);
           // Not possible
           if let Some(checkpoint) = checkpoints.pop() {
-            pyramid = checkpoint.pyramid;
+            pyramid = checkpoint.pyramid.clone();
             row_i = checkpoint.row_i;
             col_i = checkpoint.col_i;
-            next_layer = checkpoint.next_layer;
-            next_layer.push_str(&checkpoint.possible_next);
+            next_layer = checkpoint.next_layer.clone();
+            if checkpoint.possible_next.len() > 1 {
+              checkpoints.push(Checkpoint {
+                possible_next: &checkpoint.possible_next[1..],
+                ..checkpoint
+              });
+            }
+            next_layer.push_str(checkpoint.possible_next[0]);
 
             // println!("Trying next, current pyramid is");
             // for item in pyramid.iter() {
@@ -121,7 +124,7 @@ impl Solution {
         col_i += 1;
         if col_i + 1 == pyramid[row_i].len() {
           if col_i == 1 {
-            println!("Returning true");
+            // println!("Returning true");
             return true;
           }
           col_i = 0;
