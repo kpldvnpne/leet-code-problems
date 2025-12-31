@@ -4,14 +4,14 @@ class Solution {
         if (length == 0 || length == 1) {
             return s
         }
-        
+
         val isEven = length % 2 == 0
         var (left, right) = if (isEven) {
             Pair(length / 2 - 1, length / 2)
         } else {
             Pair(length / 2, length / 2)
         }
-        
+
         while (left >= 0) {
             var currentLeft = left
             var currentRight = right
