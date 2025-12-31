@@ -116,6 +116,8 @@ impl<T: Copy> LandTrait<T> for Land<T> {
 type Path = Vec<Position>;
 
 fn find_path_dfs(land: &Land<i32>, visited: &mut Vec<Vec<bool>>, position: &Position) -> Option<Path> {
+    visited[position.0][position.1] = true;
+
     if !land.has_down_from(position) {
         return Some(vec![*position]);
     }
@@ -162,7 +164,6 @@ fn find_path(land: &Land<i32>) -> Option<Path> {
 
     // Start from the top layer
     for start_pos in 0..land[0].len() {
-        visited[0][start_pos] = true;
         if land[0][start_pos] == 0 {
             let position = Position(0, start_pos);
             let path: Option<Path> = find_path_dfs(&land, &mut visited, &position);
