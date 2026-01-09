@@ -78,20 +78,20 @@ impl Solution {
 
       let mut sorted_meeting_times = combined_meetings.keys().collect::<Vec<_>>();
       sorted_meeting_times.sort();
-      let mut people_with_secret = HashSet::with_capacity(n as usize);
-      people_with_secret.insert(first_person);
-      people_with_secret.insert(0);
+      let mut knows_secret = vec![false; n as usize];
+      knows_secret[first_person as usize] = true;
+      knows_secret[0] = true;
 
       for time in &sorted_meeting_times {
         let meetings_at_time = combined_meetings.get(time).unwrap();
         let mut to_add = HashSet::new();
         let mut visited = HashSet::new();
         for person in meetings_at_time.keys() {
-          if people_with_secret.contains(person) {
+          if knows_secret[*person as usize] {
             visited.insert(*person);
             let adjacent_people = meetings_at_time.get(person).unwrap();
             for adjacent_person in adjacent_people {
-              if !people_with_secret.contains(adjacent_person) {
+              if !knows_secret[*adjacent_person as usize] {
                 to_add.insert(*adjacent_person);
               }
             }
@@ -101,7 +101,7 @@ impl Solution {
         let mut to_add: Vec<_> = to_add.into_iter().collect();
         while !to_add.is_empty() {
           let last = to_add.pop().unwrap();
-          people_with_secret.insert(last);
+          knows_secret[last as usize] = true;
           if let Some(adjacent_people) = meetings_at_time.get(&last) {
             for adjacent_person in adjacent_people {
               if !visited.contains(adjacent_person) {
@@ -110,6 +110,13 @@ impl Solution {
               }
             }
           }
+        }
+      }
+
+      let mut people_with_secret = vec![];
+      for person in 0..n {
+        if knows_secret[person as usize] {
+          people_with_secret.push(person);
         }
       }
 
