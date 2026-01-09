@@ -65,15 +65,15 @@ use std::collections::{HashMap, HashSet};
 
 impl Solution {
     pub fn find_all_people(n: i32, meetings: Vec<Vec<i32>>, first_person: i32) -> Vec<i32> {
-      let mut combined_meetings: HashMap<i32, HashMap<i32, HashSet<i32>>> = HashMap::with_capacity(n as usize);
+      let mut combined_meetings: HashMap<i32, HashMap<i32, Vec<i32>>> = HashMap::new();
       for meeting in &meetings {
         let person_a = meeting[0];
         let person_b = meeting[1];
         let time = meeting[2];
 
         let combined_meeting = combined_meetings.entry(time).or_default();
-        combined_meeting.entry(person_a).or_default().insert(person_b);
-        combined_meeting.entry(person_b).or_default().insert(person_a);
+        combined_meeting.entry(person_a).or_default().push(person_b);
+        combined_meeting.entry(person_b).or_default().push(person_a);
       }
 
       let mut sorted_meeting_times = combined_meetings.keys().collect::<Vec<_>>();
@@ -91,7 +91,7 @@ impl Solution {
             visited.insert(*person);
             let adjacent_people = meetings_at_time.get(person).unwrap();
             for adjacent_person in adjacent_people {
-              if !visited.contains(adjacent_person) {
+              if !people_with_secret.contains(adjacent_person) {
                 to_add.insert(*adjacent_person);
               }
             }
