@@ -85,10 +85,8 @@ impl Solution {
       for time in &sorted_meeting_times {
         let meetings_at_time = combined_meetings.get(time).unwrap();
         let mut to_add = HashSet::new();
-        let mut visited = HashSet::new();
         for person in meetings_at_time.keys() {
           if knows_secret[*person as usize] {
-            visited.insert(*person);
             let adjacent_people = meetings_at_time.get(person).unwrap();
             for adjacent_person in adjacent_people {
               if !knows_secret[*adjacent_person as usize] {
@@ -104,8 +102,8 @@ impl Solution {
           knows_secret[last as usize] = true;
           if let Some(adjacent_people) = meetings_at_time.get(&last) {
             for adjacent_person in adjacent_people {
-              if !visited.contains(adjacent_person) {
-                visited.insert(*adjacent_person);
+              if !knows_secret[*adjacent_person as usize] {
+                knows_secret[*adjacent_person as usize] = true;
                 to_add.push(*adjacent_person);
               }
             }
