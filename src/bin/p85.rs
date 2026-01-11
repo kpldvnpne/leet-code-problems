@@ -98,6 +98,10 @@ impl Solution {
 
       let mut max_rect = 0;
       for j in (0..n_cols).rev() {
+        let max_possible = (j + 1) * n_rows;
+        if max_rect > max_possible {
+          break;
+        }
         for i in 0..n_rows {
           let max_possible = (j + 1) * (n_rows - i);
           if max_rect > max_possible {
