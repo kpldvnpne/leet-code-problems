@@ -63,6 +63,17 @@ mod test {
     assert_eq!(expected, actual);
   }
 
+  #[test]
+  fn test63() {
+    let matrix = [["1","1","0","1"],["1","1","0","1"],["1","1","1","1"]];
+
+    let matrix = matrix.into_iter().map(|it| it.into_iter().map(|b| b.chars().next().unwrap()).collect()).collect();
+    let expected = 6;
+    let actual = Solution::maximal_rectangle(matrix);
+
+    assert_eq!(expected, actual);
+  }
+
 
 }
 
@@ -86,9 +97,19 @@ impl Solution {
       }
 
       let mut max_rect = 0;
-      for i in 0..n_rows {
-        for j in 0..n_cols {
+      for j in (0..n_cols).rev() {
+        for i in 0..n_rows {
+          let max_possible = (j + 1) * (n_rows - i);
+          if max_rect > max_possible {
+            // println!("Breaking at row={i} col={j} because max_rect={max_rect} and max_possible={max_possible}");
+            break;
+          }
           let mut cur_row_width = row_runs[i][j];
+          let max_cur_possible = cur_row_width * (n_rows - i);
+          if max_rect > max_cur_possible {
+            continue;
+          }
+
           let mut cur_max_rect = cur_row_width;
           let mut k = i;
           while cur_row_width > 0 && k < n_rows {
