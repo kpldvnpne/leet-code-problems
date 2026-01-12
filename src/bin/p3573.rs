@@ -39,6 +39,10 @@ impl Solution {
       for i in 1..n {
         for i_k in 0..k {
           dp[i_k][i] = dp[i_k][i-1]; // When the current is not sold
+
+          if dp[i_k][i] == 0 {
+            break;
+          }
         }
         for j in (0..i).rev() {
           let profit: i64 = (prices[i] - prices[j]).abs() as i64; // Normal or short-selling we dont care
