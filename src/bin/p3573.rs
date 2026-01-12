@@ -29,8 +29,53 @@ mod test {
   }
 }
 
+const EMPTY: usize = 0;
+const BOUGHT: usize = 1;
+const SOLD: usize = 2;
+
+const STATES: [usize; 3] = [EMPTY, BOUGHT, SOLD];
+
+fn max_three<T: Ord>(a: T, b: T, c: T) -> T {
+  std::cmp::max(a, std::cmp::max(b, c))
+}
+
+fn max_two<T: Ord>(a: T, b: T) -> T {
+  std::cmp::max(a, b)
+}
+
 impl Solution {
     pub fn maximum_profit(prices: Vec<i32>, k: i32) -> i64 {
+      let prices = prices.into_iter().map(|it| it as i64).collect::<Vec<_>>();
+      let n = prices.len();
+      let k = k as usize;
+      let mut dp = vec![vec![vec![0; 3]; k+1]; n];
+      // Keep all 0 for j = 0
+      // for i in 0..n {
+      //   for state in STATES {
+      //     dp[i][0][state] = 0;
+      //   }
+      // }
+
+      for j in 1..(k+1) {
+        dp[0][j][EMPTY] = 0;
+        dp[0][j][BOUGHT] = -prices[0];
+        dp[0][j][SOLD] = prices[0];
+        for i in 1..n {
+          dp[i][j][EMPTY] = max_three(dp[i-1][j][EMPTY], dp[i-1][j][BOUGHT] + prices[i], dp[i-1][j][SOLD] - prices[i]);
+          dp[i][j][BOUGHT] = max_two(dp[i-1][j][BOUGHT], dp[i-1][j-1][EMPTY] - prices[i]);
+          dp[i][j][SOLD] = max_two(dp[i-1][j][SOLD], dp[i-1][j-1][EMPTY] + prices[i]);
+        }
+      }
+
+      // let mut max_profit = 0;
+      // for j in 0..k {
+      //   max_profit = max_two(dp[n-1][j][EMPTY], max_profit);
+      // }
+
+      return dp[n-1][k][EMPTY];
+    }
+
+    pub fn maximum_profit_v2(prices: Vec<i32>, k: i32) -> i64 {
       let n = prices.len();
       let k = k as usize;
       let mut dp: Vec<Vec<i64>> = vec![vec![0; n]; k];
