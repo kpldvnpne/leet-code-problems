@@ -32,7 +32,7 @@ fn main() {
 
     let a = read_int_array::<i32>();
 
-    let mut a_map: Vec<(i32, BinaryHeap<i32>)> = vec![(0, BinaryHeap::new()); m+1];
+    let mut a_map: Vec<(i32, Vec<i32>)> = vec![(0, vec![]); m+1];
     for a_item in &a {
       a_map[*a_item as usize].0 += 1;
     }
@@ -49,10 +49,11 @@ fn main() {
 
     // Remove using gifts
     let mut n_happy = 0;
-    let mut non_empty = vec![];
+    let mut prices_max_heap = BinaryHeap::new();
     for a_i in 1..(m+1) {
-      if !a_map[a_i].1.is_empty() {
-        non_empty.push(a_i);
+      let list = &a_map[a_i].1;
+      if !list.is_empty() {
+        list.iter().for_each(|it| prices_max_heap.push(*it));
       }
 
       let count = a_map[a_i].0;
@@ -62,12 +63,8 @@ fn main() {
 
       // Remove `count` elements from either current or previous
       let mut removed = 0;
-      while removed < count && !non_empty.is_empty() {
-        let last_non_empty = non_empty.last().unwrap();
-        a_map[*last_non_empty].1.pop();
-        if a_map[*last_non_empty].1.is_empty() {
-          non_empty.pop();
-        }
+      while removed < count && !prices_max_heap.is_empty() {
+        prices_max_heap.pop();
         removed += 1;
         // println!("Removed because of gift box of beauty {}", a_i);
       }
@@ -76,16 +73,14 @@ fn main() {
     }
 
     // Now, use the rem_k to remove more
-    let mut min_price_heap = BinaryHeap::new();
-    for i in non_empty {
-      for price in &a_map[i].1 {
-        min_price_heap.push(Reverse(price));
-      }
+    let mut prices_min_heap = BinaryHeap::new();
+    for price in prices_max_heap {
+      prices_min_heap.push(Reverse(price));
     }
 
-    while !min_price_heap.is_empty() {
-      if let Some(price) = min_price_heap.pop() {
-        let price = *price.0 as i64;
+    while !prices_min_heap.is_empty() {
+      if let Some(price) = prices_min_heap.pop() {
+        let price = price.0 as i64;
         if price > rem_k {
           break;
         } else {
