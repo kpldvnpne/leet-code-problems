@@ -1,3 +1,5 @@
+# Timed out
+
 t = int(input())
 for _ in range(t):
     n = int(input())
@@ -14,7 +16,7 @@ for _ in range(t):
                 break
         if possible:
             b_c_changes += 1
-    
+
     a_b_changes = 0
     for diff in range(n):
         possible = True
@@ -25,7 +27,7 @@ for _ in range(t):
 
         if possible:
             a_b_changes += 1
-    
+
     total_changes = n * a_b_changes * b_c_changes
 
     print(f"{total_changes}")
