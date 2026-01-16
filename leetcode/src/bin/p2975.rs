@@ -49,31 +49,35 @@ mod test {
 use std::collections::HashSet;
 
 impl Solution {
-    pub fn maximize_square_area(m: i32, n: i32, h_fences: Vec<i32>, v_fences: Vec<i32>) -> i32 {
-        let mut h = vec![1];
-        for f in h_fences {
-            h.push(f);
-        }
-        h.push(m);
-        h.sort_unstable();
+    pub fn maximize_square_area(m: i32, n: i32, mut h: Vec<i32>, mut v: Vec<i32>) -> i32 {
+        // let mut h = vec![1];
+        // for f in h_fences {
+        //     h.push(f);
+        // }
+        // h.push(m);
+        // h.sort_unstable();
 
-        let mut v = vec![1];
-        for f in v_fences {
-            v.push(f);
-        }
-        v.push(n);
-        v.sort_unstable();
+        // let mut v = vec![1];
+        // for f in v_fences {
+        //     v.push(f);
+        // }
+        // v.push(n);
+        // v.sort_unstable();
 
-        let (small, big) = if h.len() < v.len() { (&h, &v) } else { (&v, &h) };
+        h.push(1); h.push(m);
+        v.push(1); v.push(n);
+
+        let (small, big) = if h.len() < v.len() { (&h, &mut v) } else { (&v, &mut h) };
 
         let mut small_intervals = HashSet::new();
         for i in 0..(small.len() - 1) {
             for j in i..(small.len()) {
-                let interval = small[j] - small[i];
+                let interval = (small[j] - small[i]).abs();
                 small_intervals.insert(interval);
             }
         }
 
+        big.sort_unstable();
         let mut max_common_interval = -1;
         for i in 0..(big.len() - 1) {
             let max_possible_interval = big[big.len() - 1] - big[i];
