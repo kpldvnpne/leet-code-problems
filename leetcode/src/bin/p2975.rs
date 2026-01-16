@@ -55,14 +55,14 @@ impl Solution {
             h.push(f);
         }
         h.push(m);
-        h.sort();
+        h.sort_unstable();
 
         let mut v = vec![1];
         for f in v_fences {
             v.push(f);
         }
         v.push(n);
-        v.sort();
+        v.sort_unstable();
 
         let (small, big) = if h.len() < v.len() { (&h, &v) } else { (&v, &h) };
 
