@@ -25,7 +25,7 @@ fn factorial(n: i32) -> i32 {
   return product;
 }
 
-fn 
+// TODO: Complete this
 
 fn main() {
   let t = read_int_line();
