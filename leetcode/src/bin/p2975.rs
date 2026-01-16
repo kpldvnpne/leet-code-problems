@@ -72,16 +72,22 @@ impl Solution {
             }
         }
 
-        let mut v_intervals = HashSet::new();
+        let mut max_common_interval = -1;
         for i in 0..(v.len() - 1) {
-            for j in (i + 1)..(v.len()) {
+            let max_possible_interval = v[v.len() - 1] - v[i];
+            if max_possible_interval < max_common_interval {
+                break;
+            }
+            for j in ((i + 1)..(v.len())).rev() {
                 let v_interval = v[j] - v[i];
-                v_intervals.insert(v_interval);
+                if h_intervals.contains(&v_interval) {
+                    max_common_interval = std::cmp::max(v_interval, max_common_interval);
+                    break;
+                }
             }
         }
 
-        let common_max = h_intervals.intersection(&v_intervals).max();
-        let ans: i64 = common_max.map_or(-1, |it| *it as i64 * *it as i64);
+        let ans = if max_common_interval == -1 { -1 } else { max_common_interval as i64 * max_common_interval as i64 };
 
         return (ans % (1_000_000_000 + 7)) as i32;
     }
