@@ -69,7 +69,8 @@ impl Solution {
 
         let (small, big) = if h.len() < v.len() { (&h, &mut v) } else { (&v, &mut h) };
 
-        let mut small_intervals = HashSet::new();
+        let n = small.len();
+        let mut small_intervals = HashSet::with_capacity(n * (n - 1) / 2);
         for i in 0..(small.len() - 1) {
             for j in i..(small.len()) {
                 let interval = (small[j] - small[i]).abs();
@@ -80,12 +81,11 @@ impl Solution {
         big.sort_unstable();
         let mut max_common_interval = -1;
         for i in 0..(big.len() - 1) {
-            let max_possible_interval = big[big.len() - 1] - big[i];
-            if max_possible_interval <= max_common_interval {
-                break;
-            }
             for j in ((i + 1)..(big.len())).rev() {
                 let interval = big[j] - big[i];
+                if interval <= max_common_interval {
+                    break;
+                }
                 if small_intervals.contains(&interval) {
                     max_common_interval = std::cmp::max(interval, max_common_interval);
                     break;
@@ -95,6 +95,6 @@ impl Solution {
 
         let ans = if max_common_interval == -1 { -1 } else { max_common_interval as i64 * max_common_interval as i64 };
 
-        return (ans % (1_000_000_000 + 7)) as i32;
+        return (ans % 1_000_000_007) as i32;
     }
 }
