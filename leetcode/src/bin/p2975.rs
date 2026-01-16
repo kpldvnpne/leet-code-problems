@@ -64,24 +64,26 @@ impl Solution {
         v.push(n);
         v.sort();
 
-        let mut h_intervals = HashSet::new();
-        for i in 0..(h.len() - 1) {
-            for j in i..(h.len()) {
-                let h_interval = h[j] - h[i];
-                h_intervals.insert(h_interval);
+        let (small, big) = if h.len() < v.len() { (&h, &v) } else { (&v, &h) };
+
+        let mut small_intervals = HashSet::new();
+        for i in 0..(small.len() - 1) {
+            for j in i..(small.len()) {
+                let interval = small[j] - small[i];
+                small_intervals.insert(interval);
             }
         }
 
         let mut max_common_interval = -1;
-        for i in 0..(v.len() - 1) {
-            let max_possible_interval = v[v.len() - 1] - v[i];
-            if max_possible_interval < max_common_interval {
+        for i in 0..(big.len() - 1) {
+            let max_possible_interval = big[big.len() - 1] - big[i];
+            if max_possible_interval <= max_common_interval {
                 break;
             }
-            for j in ((i + 1)..(v.len())).rev() {
-                let v_interval = v[j] - v[i];
-                if h_intervals.contains(&v_interval) {
-                    max_common_interval = std::cmp::max(v_interval, max_common_interval);
+            for j in ((i + 1)..(big.len())).rev() {
+                let interval = big[j] - big[i];
+                if small_intervals.contains(&interval) {
+                    max_common_interval = std::cmp::max(interval, max_common_interval);
                     break;
                 }
             }
