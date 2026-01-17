@@ -55,9 +55,33 @@ mod test {
   }
 }
 
-struct Rectangle<'a> {
-  bottom_left: &'a Vec<i32>,
-  top_right: &'a Vec<i32>,
+struct Rectangle {
+  bottom_left: Vec<i32>,
+  top_right: Vec<i32>,
+}
+
+impl Rectangle {
+  fn intersection(&self, other: &Rectangle) -> Rectangle {
+    let bottom_left_x = std::cmp::max(self.bottom_left.x(), other.bottom_left.x());
+    let bottom_left_y = std::cmp::max(self.bottom_left.y(), other.bottom_left.y());
+    let top_right_x = std::cmp::min(self.top_right.x(), other.top_right.x());
+    let top_right_y = std::cmp::min(self.top_right.y(), other.top_right.y());
+    Rectangle {
+      bottom_left: vec![bottom_left_x, bottom_left_y],
+      top_right: vec![top_right_x, top_right_y],
+    }
+  }
+
+  fn largest_square(&self) -> i64 {
+    let x_diff = self.top_right.x() - self.bottom_left.x();
+    let y_diff = self.top_right.y() - self.bottom_left.y();
+    let min = std::cmp::min(x_diff, y_diff);
+    if min < 0 {
+      return 0;
+    } else {
+      return min as i64 * min as i64;
+    }
+  }
 }
 
 trait Point {
@@ -77,23 +101,29 @@ impl Point for Vec<i32> {
 
 impl Solution {
     pub fn largest_square_area(bottom_left: Vec<Vec<i32>>, top_right: Vec<Vec<i32>>) -> i64 {
-      let mut rectangles = bottom_left.iter().zip(top_right.iter())
+      let mut rectangles = bottom_left.into_iter().zip(top_right.into_iter())
         .map(|(a, b)| Rectangle {bottom_left: a, top_right :b})
         .collect::<Vec<_>>();
       rectangles.sort_by(|a, b| a.bottom_left.x().cmp(&b.bottom_left.x()));
 
       let n = rectangles.len();
+      let mut max_area = 0; // Which means no intersection
       for i in 0..(n-1) {
         let a = &rectangles[i];
         for j in (i+1)..n {
           let b = &rectangles[j];
-          if a.top_right.x <= b.bottom_left.x {
+          if a.top_right.x() <= b.bottom_left.x() {
             // No intersection anymore
             break;
           }
 
-          
+          let intersection = a.intersection(b);
+          let area = intersection.largest_square();
+
+          max_area = std::cmp::max(max_area, area);
         }
       }
+
+      return max_area;
     }
 }
