@@ -198,22 +198,11 @@ impl Solution {
       areas.push((last_y, cur_area, interval_tree.current_width()));
 
       let half_area: f64 = cur_area / 2.0;
-      let mut ans = 0.0;
-      for i in 0..(areas.len()-1) {
-        // println!("{:?}", areas[i]);
-        let cur_area = areas[i].1;
-        let next_area = areas[i+1].1;
-        if cur_area <= half_area && half_area <= next_area {
-          let y = areas[i].0;
-          if cur_area == half_area {
-            ans = y as f64;
-          } else {
-            let width = areas[i].2;
-            ans = y as f64 + (half_area - cur_area) / width as f64;
-          }
-          break;
-        }
-      }
+      let index = areas.partition_point(|a| a.1 < half_area) - 1;
+      let y = areas[index].0;
+      let area_below = areas[index].1;
+      let width = areas[index].2;
+      let ans = y as f64 + (half_area - area_below) / width as f64;
 
       return ans;
     }
