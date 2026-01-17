@@ -99,8 +99,26 @@ impl Point for Vec<i32> {
   }
 }
 
+use std::cmp::{max, min};
+
 impl Solution {
     pub fn largest_square_area(bottom_left: Vec<Vec<i32>>, top_right: Vec<Vec<i32>>) -> i64 {
+      let mut max_side: i32 = 0; // Which means no intersection
+      let n = bottom_left.len();
+      for i in 0..(n-1) {
+        for j in (i+1)..n {
+          let w = min(top_right[i][0], top_right[j][0]) - max(bottom_left[i][0], bottom_left[j][0]);
+          let h = min(top_right[i][1], top_right[j][1]) - max(bottom_left[i][1], bottom_left[j][1]);
+
+          let square_len = min(w, h);
+          max_side = max(max_side, square_len)
+        }
+      }
+
+      return max_side as i64 * max_side as i64;
+    }
+
+    pub fn largest_square_area_v1(bottom_left: Vec<Vec<i32>>, top_right: Vec<Vec<i32>>) -> i64 {
       let mut rectangles = bottom_left.into_iter().zip(top_right.into_iter())
         .map(|(a, b)| Rectangle {bottom_left: a, top_right :b})
         .collect::<Vec<_>>();
