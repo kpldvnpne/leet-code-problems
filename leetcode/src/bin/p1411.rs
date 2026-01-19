@@ -1,4 +1,4 @@
-struct Solution;
+pub struct Solution;
 
 fn main() {
     println!("Len = {}", get_first_row_combinations().len());

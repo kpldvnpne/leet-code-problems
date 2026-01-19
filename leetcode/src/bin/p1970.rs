@@ -1,7 +1,7 @@
 // Last found path save
 // Depth-first search with priority for the downward direction
 
-struct Solution;
+pub struct Solution;
 
 fn main() { }
 

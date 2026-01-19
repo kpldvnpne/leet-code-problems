@@ -17,7 +17,7 @@ impl TreeNode {
   }
 }
 
-struct Solution;
+pub struct Solution;
 
 fn main() {}
 

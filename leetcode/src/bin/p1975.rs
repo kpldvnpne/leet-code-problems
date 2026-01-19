@@ -2,7 +2,7 @@
 
 use std::ops::Index;
 
-struct Solution;
+pub struct Solution;
 
 fn main() {}
 

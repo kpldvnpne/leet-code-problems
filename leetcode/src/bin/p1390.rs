@@ -1,4 +1,4 @@
-struct Solution;
+pub struct Solution;
 
 fn main() {
     println!("Sum divisors for 21 = {}", get_divisors_sum_if_4(21));
