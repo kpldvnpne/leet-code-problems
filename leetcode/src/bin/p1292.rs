@@ -72,6 +72,46 @@ impl Solution {
     pub fn max_side_length(mat: Vec<Vec<i32>>, threshold: i32) -> i32 {
         let m = mat.len();
         let n = mat[0].len();
+        let mut rect_sums = vec![vec![0; n]; m];
+
+        rect_sums[0][0] = mat[0][0];
+        for j in 1..n {
+            rect_sums[0][j] = rect_sums[0][j-1] + mat[0][j];
+        }
+
+        for i in 1..m {
+            let mut row_sum = mat[i][0];
+            rect_sums[i][0] = rect_sums[i-1][0] + row_sum;
+            for j in 1..n {
+                row_sum += mat[i][j];
+                rect_sums[i][j] = rect_sums[i-1][j] + row_sum;
+            }
+        }
+
+        let max_sq_size = std::cmp::min(m, n);
+        for sq_size in (1..=max_sq_size).rev() {
+            for i in (sq_size-1)..m {
+                for j in (sq_size-1)..n {
+                    let above_it = if i >= sq_size { rect_sums[i-sq_size][j] } else { 0 };
+                    let beside_it = if j >= sq_size { rect_sums[i][j-sq_size] } else { 0 };
+                    let corner_it = if i >= sq_size && j >= sq_size { rect_sums[i-sq_size][j-sq_size] } else { 0 };
+                    let it = rect_sums[i][j];
+
+                    let rect_sum = it - above_it - beside_it + corner_it;
+
+                    if rect_sum <= threshold {
+                        return sq_size as i32;
+                    }
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    pub fn max_side_length_v2(mat: Vec<Vec<i32>>, threshold: i32) -> i32 {
+        let m = mat.len();
+        let n = mat[0].len();
         let mut prefix_sums = vec![vec![0; n]; m];
 
         for r_i in 0..m {
