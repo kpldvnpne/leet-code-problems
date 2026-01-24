@@ -1,7 +1,5 @@
 // Problem: https://leetcode.com/problems/maximum-matrix-sum/description/
 
-use std::ops::Index;
-
 pub struct Solution;
 
 fn main() {}
