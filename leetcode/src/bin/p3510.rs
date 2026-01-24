@@ -39,7 +39,7 @@ use std::{cell::RefCell, rc::Rc};
 
 struct Node {
   value: i64,
-  index: (usize, usize),
+  index: usize,
   prev: Option<Rc<RefCell<Node>>>,
   next: Option<Rc<RefCell<Node>>>,
 }
@@ -78,18 +78,18 @@ impl Solution {
       let n = nums.len();
 
       let mut n_smaller_than_prev = 0;
-      let mut min_sums_heap = BinaryHeap::with_capacity(n);
+      let mut min_sums_heap = BinaryHeap::with_capacity(5 * n);
 
       let mut prev = Rc::new(RefCell::new(Node {
         value: nums[0] as i64,
-        index: (0, 0),
+        index: 0,
         prev: None,
         next: None,
       }));
       for i in 1..n {
         let cur = Rc::new(RefCell::new(Node {
           value: nums[i] as i64,
-          index: (i, i),
+          index: i,
           prev: Some(Rc::clone(&prev)),
           next: None,
         }));
@@ -98,7 +98,7 @@ impl Solution {
 
         let sum = Sum {
           sum: prev.borrow().value + cur.borrow().value,
-          index: cur.borrow().index.1,
+          index: cur.borrow().index,
           first: Rc::clone(&prev),
           second: Rc::clone(&cur)
         };
@@ -134,7 +134,7 @@ impl Solution {
         let new_val = first_val + second_val;
         let new_node = Rc::new(RefCell::new(Node{
           value: new_val,
-          index: (min_sum.first.borrow().index.0, min_sum.second.borrow().index.1),
+          index:min_sum.second.borrow().index,
           prev: min_sum.first.borrow().prev.as_ref().map(|it| Rc::clone(&it)),
           next: min_sum.second.borrow().next.as_ref().map(|it| Rc::clone(&it)),
         }));
@@ -152,7 +152,7 @@ impl Solution {
 
           let prev_sum_node = Sum {
             sum: prev_val + new_val,
-            index: new_node.borrow().index.1,
+            index: new_node.borrow().index,
             first: Rc::clone(&prev_node),
             second: Rc::clone(&new_node),
           };
@@ -176,7 +176,7 @@ impl Solution {
 
           let next_sum_node = Sum {
             sum: next_val + new_val,
-            index: next_node.borrow().index.1,
+            index: next_node.borrow().index,
             first: Rc::clone(&new_node),
             second: Rc::clone(&next_node),
           };
