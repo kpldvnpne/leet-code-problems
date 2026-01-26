@@ -62,6 +62,7 @@ fn get_max_len(sorted_bars: &Vec<i32>) -> i32 {
 }
 
 impl Solution {
+  #[allow(unused)]
     pub fn maximize_square_hole_area(n: i32, m: i32, mut h_bars: Vec<i32>, mut v_bars: Vec<i32>) -> i32 {
         h_bars.sort();
         v_bars.sort();

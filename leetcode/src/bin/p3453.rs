@@ -2,6 +2,7 @@ pub struct Solution;
 
 fn main() {}
 
+#[allow(unused)]
 fn assert_f64_close(a: f64, b: f64, epsilon: f64) {
     assert!((a - b).abs() < epsilon, "Floats are not close enough: |{a} - {b}| >= {epsilon}");
 }

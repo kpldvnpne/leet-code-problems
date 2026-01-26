@@ -33,8 +33,6 @@ const EMPTY: usize = 0;
 const BOUGHT: usize = 1;
 const SOLD: usize = 2;
 
-const STATES: [usize; 3] = [EMPTY, BOUGHT, SOLD];
-
 fn max_three<T: Ord>(a: T, b: T, c: T) -> T {
   std::cmp::max(a, std::cmp::max(b, c))
 }
