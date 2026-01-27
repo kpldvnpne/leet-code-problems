@@ -62,11 +62,11 @@ impl Ord for Distance {
     }
 }
 
-use std::collections::{HashMap, HashSet, BinaryHeap};
+use std::collections::{BTreeMap, BinaryHeap};
 impl Solution {
     pub fn min_cost(n: i32, edges: Vec<Vec<i32>>) -> i32 {
       let n = n as usize;
-      let mut graph = vec![HashMap::new(); n as usize];
+      let mut graph = vec![BTreeMap::new(); n as usize];
 
       // Construct the graph from the edges
       for edge in edges {
@@ -79,8 +79,8 @@ impl Solution {
       }
 
       // Get shortest path from 0 to n-1 using Djikstra's Algorithm
-      let mut visited = HashSet::new();
-      visited.insert(0);
+      let mut visited = vec![false; n];
+      visited[0] = true;
       let mut queue = BinaryHeap::new();
       for (to, weight) in graph[0].iter() {
         queue.push(Distance{
@@ -91,11 +91,11 @@ impl Solution {
       }
 
       let mut ans = 0;
-      while !visited.contains(&(n-1)) && !queue.is_empty() {
+      while !queue.is_empty() {
         let shortest = queue.pop().unwrap();
         let vertex = shortest.to;
-        if !visited.contains(&vertex) {
-          visited.insert(vertex);
+        if !visited[vertex] {
+          visited[vertex] = true;
 
           if vertex == n-1 {
             ans = shortest.distance;
@@ -103,6 +103,9 @@ impl Solution {
           }
 
           for (to, weight) in graph[vertex].iter() {
+            if visited[*to] {
+              continue;
+            }
             queue.push(Distance {
               distance: shortest.distance + *weight,
               from: vertex,
@@ -112,7 +115,7 @@ impl Solution {
         }
       }
 
-      if visited.contains(&(n-1)) {
+      if visited[n-1] {
         return ans as i32;
       } else {
         return -1;
