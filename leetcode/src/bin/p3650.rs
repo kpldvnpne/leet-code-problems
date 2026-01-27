@@ -62,20 +62,18 @@ impl Ord for Distance {
     }
 }
 
-use std::collections::{BTreeMap, BinaryHeap};
+use std::collections::{BinaryHeap};
 impl Solution {
     pub fn min_cost(n: i32, edges: Vec<Vec<i32>>) -> i32 {
       let n = n as usize;
-      let mut graph = vec![BTreeMap::new(); n as usize];
+      let mut graph = vec![vec![]; n as usize];
 
       // Construct the graph from the edges
       for edge in edges {
         let [u, v, w] = edge[..3] else { panic!() };
         let (u, v, w) = (u as usize, v as usize, w as u32);
-        let entry = graph[u].entry(v).or_insert(w);
-        *entry = std::cmp::min(*entry, w);
-        let entry = graph[v].entry(u).or_insert(2 * w);
-        *entry = std::cmp::min(*entry, 2 * w);
+        graph[u].push((v, w));
+        graph[v].push((u, 2*w));
       }
 
       // Get shortest path from 0 to n-1 using Djikstra's Algorithm
