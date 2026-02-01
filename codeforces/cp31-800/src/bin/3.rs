@@ -12,10 +12,6 @@ fn read_val_line<T: FromStr>() -> T
   read_line().trim().parse().unwrap()
 }
 
-fn is_empty(char: u8) -> bool {
-  char == '.' as u8
-}
-
 fn is_block(char: u8) -> bool {
   char == '#' as u8
 }
