@@ -18,19 +18,80 @@ mod test {
 
     assert_eq!(expected, board);
   }
+
+  #[test]
+  fn test2() {
+    let mut board= [[".",".","9","7","4","8",".",".","."],["7",".",".",".",".",".",".",".","."],[".","2",".","1",".","9",".",".","."],[".",".","7",".",".",".","2","4","."],[".","6","4",".","1",".","5","9","."],[".","9","8",".",".",".","3",".","."],[".",".",".","8",".","3",".","2","."],[".",".",".",".",".",".",".",".","6"],[".",".",".","2","7","5","9",".","."]]
+      .into_iter().map(|row| row.into_iter().map(|it| it.chars().next().unwrap()).collect()).collect();
+
+    let expected: Vec<Vec<char>> = [["5","1","9","7","4","8","6","3","2"],["7","8","3","6","5","2","4","1","9"],["4","2","6","1","3","9","8","7","5"],["3","5","7","9","8","6","2","4","1"],["2","6","4","3","1","7","5","9","8"],["1","9","8","5","2","4","3","6","7"],["9","7","5","8","6","3","1","2","4"],["8","3","2","4","9","1","7","5","6"],["6","4","1","2","7","5","9","8","3"]]
+      .into_iter().map(|row| row.into_iter().map(|it| it.chars().next().unwrap()).collect()).collect();
+
+    Solution::solve_sudoku(&mut board);
+
+    assert_eq!(expected, board);
+  }
+
+  #[test]
+  fn test_choose() {
+    println!("{:?}", choose(5, 3));
+  }
 }
 
-use std::collections::HashSet;
+use std::collections::{HashSet, BinaryHeap};
 
-// fn print_board(board: &Vec<Vec<char>>) {
-//   for row in board {
-//     for item in row {
-//       print!("{} ", item);
-//     }
-//     println!("");
-//   }
-//   println!("---");
-// }
+fn print_board(board: &Vec<Vec<char>>) {
+  for row in board {
+    for item in row {
+      print!("{} ", item);
+    }
+    println!("");
+  }
+  println!("---");
+}
+
+#[derive(Eq, PartialEq)]
+struct ToFillItem {
+  row: usize,
+  col: usize,
+  n_options: usize,
+}
+
+impl Ord for ToFillItem {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+      other.n_options.cmp(&self.n_options)
+    }
+}
+
+impl PartialOrd for ToFillItem {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+fn choose_recursive(n: usize, k: usize, start_index: usize) -> Vec<Vec<usize>> {
+  let mut indices = vec![];
+  for i in start_index..(n - k + 1) {
+    if k == 1 {
+      indices.push(vec![i]);
+    } else {
+      for mut index in choose_recursive(n, k-1, i+1) {
+        index.push(i);
+        indices.push(index);
+      }
+    }
+  }
+
+  return indices;
+}
+
+fn choose(n: usize, k: usize) -> Vec<Vec<usize>> {
+  if n < k {
+    return vec![];
+  }
+
+  choose_recursive(n, k, 0).into_iter().map(|row| row.into_iter().rev().collect()).collect()
+}
 
 impl Solution {
     pub fn solve_sudoku(board: &mut Vec<Vec<char>>) {
@@ -51,7 +112,7 @@ impl Solution {
         }
       }
       let mut possibilities = vec![vec![HashSet::<usize>::with_capacity(9); 9]; 9];
-      let mut to_fill = vec![];
+      let mut to_fill = BinaryHeap::new();
       for i in 0..9 {
         for j in 0..9 {
           if board[i][j] != '.' {
@@ -64,10 +125,11 @@ impl Solution {
             }
           }
 
-          if possibilities[i][j].len() == 1 {
-            // println!("{} {}: {}", i, j, possibilities[i][j].iter().next().unwrap());
-            to_fill.push((i, j));
-          }
+          to_fill.push(ToFillItem {
+            row: i,
+            col: j,
+            n_options: possibilities[i][j].len()
+          });
         }
       }
 
@@ -82,54 +144,93 @@ impl Solution {
       // }
 
       while !to_fill.is_empty() {
-        let (i, j) = to_fill.pop().unwrap();
-        if possibilities[i][j].len() == 0 {
-          println!("{} {} had probabilities, but is now empty", i, j);
-          break;
+        let to_fill_item = to_fill.pop().unwrap();
+        if to_fill_item.n_options > possibilities[to_fill_item.row][to_fill_item.col].len() {
+          continue;
         }
-        let item = *possibilities[i][j].iter().next().unwrap();
-        board[i][j] = (item as u8 + '0' as u8) as char;
-        possibilities[i][j].remove(&item);
-        // println!("Inserting item {} at {} {}", item, i, j);
-        // print_board(&board);
 
-        // Update everything in the same row
-        for col_j in 0..9 {
-          if possibilities[i][col_j].contains(&item) {
-            // println!("Removing {} from {},{}", item, i, col_j);
-            possibilities[i][col_j].remove(&item);
+        let i = to_fill_item.row;
+        let j = to_fill_item.col;
+        let col_indices = (0..9).map(|it| (it, j));
+        let row_indices = (0..9).map(|it| (i, it));
+        let cell_indices = (i/3*3..i/3*3+3).zip(j/3*3..j/3*3+3);
 
-            if possibilities[i][col_j].len() == 1 {
-              to_fill.push((i, col_j));
+        if to_fill_item.n_options == 0 {
+          panic!("n_options is 0");
+        }
+
+        if to_fill_item.n_options == 1 {
+          let item = *possibilities[i][j].iter().next().unwrap();
+          possibilities[i][j].remove(&item);
+
+          board[i][j] = (item as u8 + '0' as u8) as char;
+
+          let all_indices = col_indices.chain(row_indices).chain(cell_indices);
+
+          for (i, j) in all_indices {
+            if possibilities[i][j].contains(&item) {
+              possibilities[i][j].remove(&item);
+
+              to_fill.push(ToFillItem {
+                row: i,
+                col: j,
+                n_options: possibilities[i][j].len()
+              });
             }
           }
-        }
+        } else {
+          for indices in [col_indices.collect::<Vec<_>>(), row_indices.collect(), cell_indices.collect()] {
+            let req_len = possibilities[i][j].len();
+            let collected = indices.iter().filter(|(i, j)| possibilities[*i][*j].len() == req_len).collect::<Vec<_>>();
 
-        // Update everything in the same col
-        for row_i in 0..9 {
-          if possibilities[row_i][j].contains(&item) {
-            // println!("Removing {} from {},{}", item, row_i, j);
+            for choices in choose(collected.len(), req_len) {
+              println!("Req len: {}, Collected: {}", req_len, collected.len());
+              println!("Choices: {:?}", choices);
+              let first_choice = collected[choices[0]];
+              let mut common = possibilities[first_choice.0][first_choice.1].clone();
+              for i in &choices[1..choices.len()] {
+                let choice = collected[*i];
+                let possibility = &possibilities[choice.0][choice.1];
+                common = common.intersection(possibility).map(|it| *it).collect();
 
-            possibilities[row_i][j].remove(&item);
-
-            if possibilities[row_i][j].len() == 1 {
-              to_fill.push((row_i, j));
-            }
-          }
-        }
-
-        // Update everything in the same sq
-        for row_i in (i/3*3)..(i/3*3+3) {
-          for col_j in (j/3*3)..(j/3*3+3) {
-            if possibilities[row_i][col_j].contains(&item) {
-              // println!("Removing {} from box: {},{}", item, row_i, j);
-              possibilities[row_i][col_j].remove(&item);
-
-              if possibilities[row_i][col_j].len() == 1{
-                to_fill.push((row_i, col_j));
+                if common.len() != req_len {
+                  break;
+                }
               }
+
+              // Can be removed from the other indices
+              if common.len() == req_len {
+                let choices_to_skip: HashSet<_> = choices.iter().map(|choice| collected[*choice]).collect();
+                let indices_to_prune = indices.iter().filter(|it| !choices_to_skip.contains(it));
+                for index in indices_to_prune {
+                  let (i, j) = *index;
+                  for item in &common {
+                    if possibilities[i][j].contains(item) {
+                      possibilities[i][j].remove(item);
+
+                      to_fill.push(ToFillItem {
+                        row: i,
+                        col: j,
+                        n_options: possibilities[i][j].len()
+                      })
+                    }
+                  }
+                }
+              }
+
             }
           }
+        }
+
+      }
+
+      println!("Board");
+      print_board(&board);
+
+      println!("Possibilities:");
+      for i in 0..9 {
+        for j in 0..9 {
+          println!("At {} {}: {:?}", i+1, j+1, possibilities[i][j]);
         }
       }
     }
