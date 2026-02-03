@@ -25,8 +25,43 @@ mod test {
   }
 }
 
+enum Status {
+  Increasing,
+  Decreasing,
+}
+
 impl Solution {
   pub fn is_trionic(nums: Vec<i32>) -> bool {
+    let n = nums.len();
+    if nums[0] >= nums[1] {
+      return false;
+    }
+    let mut status = Status::Increasing;
+    let mut n_changed = 1;
+    for i in 2..n {
+      if nums[i-1] == nums[i] {
+        return false;
+      }
+      if matches!(status, Status::Increasing) {
+        if nums[i-1] > nums[i] {
+          status = Status::Decreasing;
+          n_changed += 1;
+        }
+      } else { // Decreasing
+        if nums[i-1] < nums[i] {
+          status = Status::Increasing;
+          n_changed += 1;
+        }
+      }
+
+      if n_changed > 3 {
+        return false;
+      }
+    } 
+    return n_changed == 3;
+  }
+
+  pub fn is_trionic_v1(nums: Vec<i32>) -> bool {
     let n = nums.len();
     if n < 4 {
       return false;
