@@ -47,6 +47,8 @@ fn main() {
 
     let mut running = 1;
     let mut min_ops = usize::MAX;
+    let mut first_item = 0;
+    let mut first_item_len = 0;
     for i in 1..n+1 {
       if i < n && a[i] == a[i-1] {
         running += 1;
@@ -55,6 +57,12 @@ fn main() {
         let after = n - i;
         let n_ops = calc_n_ops(running, before, after);
         min_ops = min_ops.min(n_ops);
+
+        if first_item == 0 {
+          first_item = a[i-1];
+          first_item_len = running;
+        }
+
         running = 1;
       }
     }
