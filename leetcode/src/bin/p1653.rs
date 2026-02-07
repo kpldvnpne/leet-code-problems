@@ -27,6 +27,24 @@ mod test {
 
 impl Solution {
   pub fn minimum_deletions(s: String) -> i32 {
+    let mut n_bs = s.bytes().filter(|it| *it == b'b').count();
+
+    let mut min_del = n_bs;
+    let mut n_as = 0;
+    for c in s.bytes().rev() {
+      if c == b'b' {
+        n_bs -= 1;
+      } else {
+        n_as += 1;
+      }
+      let n_del = n_as + n_bs;
+      min_del = min_del.min(n_del);
+    }
+
+    return min_del as i32;
+  }
+
+  pub fn minimum_deletions_v1(s: String) -> i32 {
     let n = s.len();
     let mut n_bs = vec![0; n+1];
     let mut n_as = vec![0; n+1];
