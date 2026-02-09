@@ -20,6 +20,7 @@ fn read_vector_line<T: FromStr>() -> Vec<T>
   read_line().trim().split_ascii_whitespace().map(|it| it.trim().parse().unwrap()).collect()
 }
 
+// 26 minutes
 fn main() {
   let t = read_val_line::<u32>();
   for _ in 0..t {
