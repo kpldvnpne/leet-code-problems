@@ -78,28 +78,51 @@ fn get_minute(perm: &[u8]) ->  Option<u8> {
   }
 }
 
-impl Solution {
-    pub fn read_binary_watch(turned_on: i32) -> Vec<String> {
-      if turned_on > 8 {
-        return vec![];
-      }
-
-      let permutations = get_permutation(10, turned_on as usize);
-
-      // println!("{:?}", permutations);
-
-      let mut ans = vec![];
-      for mut perm in permutations {
-        perm.reverse();
-        if let Some(hour) = get_hour(&perm[..4]) {
-          if let Some(min) = get_minute(&perm[4..perm.len()]) {
-            let time = format!("{}:{:02}", hour, min);
-            ans.push(time);
-          }
-        }
-
-      }
-
-      return ans;
+fn count_bits(n: i32, max: usize) -> i32 {
+  let mut count = 0;
+  for i in 0..max {
+    if (n >> i) & 1 == 1 {
+      count += 1;
     }
+  }
+  return count;
+}
+
+impl Solution {
+  pub fn read_binary_watch(turned_on: i32) -> Vec<String> {
+    let mut ans = vec![];
+    for hour in 0..12 {
+      for min in 0..60 {
+        if count_bits(hour, 4) + count_bits(min, 6) == turned_on {
+          ans.push(format!("{}:{:02}", hour, min));
+        }
+      }
+    }
+
+    return ans;
+  }
+
+  pub fn read_binary_watch_v1(turned_on: i32) -> Vec<String> {
+    if turned_on > 8 {
+      return vec![];
+    }
+
+    let permutations = get_permutation(10, turned_on as usize);
+
+    // println!("{:?}", permutations);
+
+    let mut ans = vec![];
+    for mut perm in permutations {
+      perm.reverse();
+      if let Some(hour) = get_hour(&perm[..4]) {
+        if let Some(min) = get_minute(&perm[4..perm.len()]) {
+          let time = format!("{}:{:02}", hour, min);
+          ans.push(time);
+        }
+      }
+
+    }
+
+    return ans;
+  }
 }
