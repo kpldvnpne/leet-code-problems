@@ -59,25 +59,55 @@ fn is_diff_balanced(c1: &[i32], c2: &[i32]) -> bool {
 }
 
 impl Solution {
-    pub fn longest_balanced(s: String) -> i32 {
+  pub fn longest_balanced(s: String) -> i32 {
+    let n = s.len();
+    let s = s.as_bytes();
+    let mut ans = 0;
+    for i in 0..n {
       let mut count = [0; 26];
-      let mut counts = Vec::with_capacity(s.len() + 1);
-      counts.push(count.clone());
-      for c in s.chars() {
-        let index = to_index(c);
+      let mut max_count = 0;
+      let mut n_distinct = 0;
+      for j in i..n {
+        let index = s[j] as usize - 'a' as usize;
         count[index] += 1;
-        counts.push(count.clone());
-      }
 
-      for len in (1..=s.len()).rev() {
-        for start in 0..=(s.len() - len) {
-          let end = start + len;
-          if is_diff_balanced(&counts[start], &counts[end]) {
-            return len as i32;
-          }
+        if count[index] == 1 {
+          n_distinct += 1;
+        }
+
+        max_count = max_count.max(count[index]);
+
+        if max_count * n_distinct == (j - i + 1) {
+          ans = ans.max(j - i + 1);
         }
       }
-
-      unreachable!();
     }
+
+    return ans as i32;
+  }
+
+  pub fn longest_balanced_v1(s: String) -> i32 {
+    if s.len() < 3 {
+      return s.len() as i32;
+    }
+    let mut count = [0; 26];
+    let mut counts = Vec::with_capacity(s.len() + 1);
+    counts.push(count.clone());
+    for c in s.chars() {
+      let index = to_index(c);
+      count[index] += 1;
+      counts.push(count.clone());
+    }
+
+    for len in (1..=s.len()).rev() {
+      for start in 0..=(s.len() - len) {
+        let end = start + len;
+        if is_diff_balanced(&counts[start], &counts[end]) {
+          return len as i32;
+        }
+      }
+    }
+
+    unreachable!();
+  }
 }
