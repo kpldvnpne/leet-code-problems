@@ -35,8 +35,8 @@ fn main() {
 
   let mut new_k = 0;
   let mut gaps_removed = 0;
-  for gap in &gaps {
-    let add_k = gap / (x + 1);
+  for &gap in &gaps {
+    let add_k = (gap - 1) / x;
     if new_k + add_k <= k {
       gaps_removed += 1;
       new_k = new_k + add_k;
