@@ -20,8 +20,9 @@ fn read_vector_line<T: FromStr>() -> Vec<T>
   read_line().trim().split_ascii_whitespace().map(|it| it.trim().parse().unwrap()).collect()
 }
 
-fn main() {
-  let n = read_val_line::<i32>();
+#[allow(dead_code)]
+fn own_slower() {
+  let n: i32 = read_val_line::<i32>();
   let mut ans = 0;
   for i in -n..=n {
     for j in -n..=n {
@@ -45,5 +46,15 @@ fn main() {
     }
   }
 
+  println!("{}", ans);
+}
+
+fn main() {
+  let n: i32 = read_val_line::<i32>();
+  let ans = if n % 2 == 0 {
+    (n / 2 + 1) * (n / 2 + 1)
+  } else {
+    2 * (n / 2 + 1) * (n / 2 + 2)
+  };
   println!("{}", ans);
 }
