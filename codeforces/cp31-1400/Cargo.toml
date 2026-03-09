@@ -1,0 +1,6 @@
+[package]
+name = "cp31-1400"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
