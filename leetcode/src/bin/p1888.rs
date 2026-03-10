@@ -52,6 +52,10 @@ impl Solution {
       }
     }
 
+    if n % 2 == 0 {
+      return from_front.1[n-1].min(from_front.0[n-1]);
+    }
+
     let mut from_back = (vec![0; n], vec![0; n]);
     for (i, &c) in s.iter().enumerate().rev() {
       if i < n-1 {
@@ -68,13 +72,9 @@ impl Solution {
 
     let mut min_flips = i32::MAX;
     for i in 0..n {
-      let for_start_0 = from_back.0[i] + if i > 0 {
-        if n % 2 == 0 { from_front.1[i-1] } else { from_front.0[i-1] }
-      } else { 0 };
+      let for_start_0 = from_back.0[i] + if i > 0 { from_front.0[i-1] } else { 0 };
 
-      let for_start_1 = from_back.1[i] + if i > 0 {
-        if n % 2 == 0 { from_front.0[i-1] } else { from_front.1[i-1] }
-      } else { 0 };
+      let for_start_1 = from_back.1[i] + if i > 0 { from_front.1[i-1] } else { 0 };
 
       min_flips = min_flips.min(for_start_0.min(for_start_1));
     }
