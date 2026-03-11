@@ -50,7 +50,7 @@ fn main() {
 
       for i in (0..32).rev() {
         if (k >> i) & 1 == 0 {
-          if al >> i == 1 {
+          if (al >> i) & 1 == 1 {
             min = min.max((next_zero[i][l] - l) as i32 - 1).min(max);
           }
         } else {
