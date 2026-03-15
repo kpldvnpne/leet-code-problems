@@ -1,23 +1,24 @@
 fn main() {}
 
-enum OpType {
-  Add,
-  Mult
-}
-
-struct Op {
-  operand: i64,
-  op_type: OpType,
-}
-
 struct Fancy {
   list: Vec<i64>,
-  ops: Vec<Op>,
-  last_ops: Vec<usize>
+  mult: i64,
+  add: i64
 }
 
-
 const MOD: i64 = 1_000_000_000 + 7;
+
+fn bit_pow(base: i64, pow: i64) -> i64 {
+  let mut base = base;
+  let mut result = 1;
+  for i in 0..30 { // NOTE: Only works for pow < 10^9
+    if (pow >> i) & 1 == 1 {
+      result = (result * base) % MOD;
+    }
+    base = (base * base) % MOD;
+  }
+  return result;
+}
 
 /**
  * `&self` means the method takes an immutable reference.
@@ -36,22 +37,24 @@ impl Fancy {
     fn new() -> Self {
       Fancy {
         list: vec![],
-        ops: vec![],
-        last_ops: vec![]
+        mult: 1,
+        add: 0,
       }
     }
 
     fn append(&mut self, val: i32) {
-      self.list.push(val as i64);
-      self.last_ops.push(self.ops.len());
+      let x = ((val as i64 - self.add + MOD) % MOD * bit_pow(self.mult, MOD - 2)) % MOD;
+      self.list.push(x);
     }
 
     fn add_all(&mut self, inc: i32) {
-      self.ops.push(Op{operand: inc as i64, op_type: OpType::Add});
+      self.add = (self.add + inc as i64) % MOD;
     }
 
     fn mult_all(&mut self, m: i32) {
-      self.ops.push(Op{operand: m as i64, op_type: OpType::Mult});
+      let m = m as i64;
+      self.mult = (self.mult * m) % MOD;
+      self.add = (self.add * m) % MOD;
     }
 
     fn get_index(&mut self, idx: i32) -> i32 {
@@ -59,16 +62,7 @@ impl Fancy {
       if idx >= self.list.len() {
         return -1;
       }
-      let mut result = self.list[idx];
-      for op in &self.ops[self.last_ops[idx]..self.ops.len()] {
-        if matches!(op.op_type, OpType::Add) {
-          result = (result + op.operand) % MOD;
-        } else {
-          result = (result * op.operand) % MOD;
-        }
-      }
-      self.list[idx] = result;
-      self.last_ops[idx] = self.ops.len();
-      return result as i32;
+      let x = self.list[idx];
+      return (((x * self.mult) % MOD + self.add) % MOD) as i32;
     }
 }
