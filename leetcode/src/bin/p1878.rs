@@ -51,15 +51,20 @@ impl Solution {
             }
         }
 
-        use std::collections::BTreeSet;
-        let mut ans = BTreeSet::new();
+        let mut ans = vec![];
+        fn add_to_ans(ans: &mut Vec<i32>, val: i32) {
+          if !ans.contains(&val) {
+            ans.push(val);
+            ans.sort_by(|a, b| b.cmp(&a));
+            if ans.len() > 3 {
+              ans.pop();
+            }
+          };
+        }
         for i in 0..m {
             for j in 0..n {
                 let mut sum = grid[i][j];
-                ans.insert(sum);
-                if ans.len() > 3 {
-                  ans.pop_first();
-                }
+                add_to_ans(&mut ans, sum);
 
                 let left_indices = (i+1..m).zip((0..j).rev());
                 let right_indices = (i+1..m).zip(j+1..n);
@@ -73,14 +78,11 @@ impl Solution {
                     let right_side_sum = non_leading_sum[bottom_index.0][bottom_index.1] - non_leading_sum[right_index.0][right_index.1];
                     let this_rhombus_sum = sum + left_side_sum + right_side_sum - grid[bottom_index.0][bottom_index.1];
 
-                    ans.insert(this_rhombus_sum);
-                    if ans.len() > 3 {
-                      ans.pop_first();
-                    }
+                    add_to_ans(&mut ans, this_rhombus_sum);
                 }
             }
         }
 
-        return ans.into_iter().rev().collect();
+        return ans.into_iter().collect();
     }
 }
