@@ -4,6 +4,7 @@ fn main() {}
 
 use std::collections::BTreeMap;
 
+#[derive(Clone)]
 struct SubMatrix {
     elements: BTreeMap<i32, usize>
 }
@@ -58,14 +59,27 @@ impl Solution {
         let n_cols = n-k+1;
         let n_rows = m-k+1;
         let mut ans = vec![vec![0; n_cols]; n_rows];
-        for i in 0..n_rows {
-            let mut sub_matrix = SubMatrix::new();
-            for k_i in i..(i+k) {
-                for k_j in 0..k {
-                    sub_matrix.add(grid[k_i][k_j]);
-                }
+
+        let mut sub_matrix = SubMatrix::new();
+        let mut sub_matrices = Vec::with_capacity(n_rows);
+        for k_i in 0..k {
+            for k_j in 0..k {
+                sub_matrix.add(grid[k_i][k_j]);
+            }
+        }
+        ans[0][0] = sub_matrix.min_abs_diff();
+        sub_matrices.push(sub_matrix.clone());
+        for i in 1..n_rows {
+            for k_j in 0..k {
+                sub_matrix.add(grid[i+k-1][k_j]);
+                sub_matrix.remove(grid[i-1][k_j]);
             }
             ans[i][0] = sub_matrix.min_abs_diff();
+            sub_matrices.push(sub_matrix.clone());
+        }
+
+        for i in 0..n_rows {
+            let sub_matrix = &mut sub_matrices[i];
 
             for j in k..n {
                 for k_i in i..(i+k) {
