@@ -2,33 +2,39 @@ pub struct Solution;
 
 fn main() {}
 
+
 impl Solution {
     pub fn largest_submatrix(matrix: Vec<Vec<i32>>) -> i32 {
         let m = matrix.len();
         let n = matrix[0].len();
 
-        let mut prev_heights = vec![0; n];
+        let mut prev_heights: Vec<(i32, usize)> = vec![];
         let mut ans = 0;
         for i in 0..m {
-          let mut heights = vec![0; n];
-          for j in 0..n {
-            if matrix[i][j] != 0 {
-              heights[j] = prev_heights[j] + 1;
+          let mut heights = Vec::with_capacity(n);
+          let mut seen = vec![false; n];
+
+          for (prev_height, j) in prev_heights {
+            seen[j] = true;
+            if matrix[i][j] == 1 {
+
+              heights.push((prev_height + 1, j));
             }
           }
 
-          prev_heights = heights.clone();
-          heights.sort_unstable_by(|a, b| {b.cmp(&a)});
-
           for j in 0..n {
-            if heights[j] == 0 {
-              break;
+            if !seen[j] && matrix[i][j] == 1 {
+              heights.push((1, j));
             }
-            let rect_size = (j + 1) * heights[j];
-            ans = ans.max(rect_size);
           }
+
+          for (j, &(height, _)) in heights.iter().enumerate() {
+            ans = ans.max((j + 1) as i32 * height);
+          }
+
+          prev_heights = heights;
         }
 
-        return ans as i32;
+        return ans;
     }
 }
