@@ -6,7 +6,6 @@ const MOD: i64 = 1_000_000_000 + 7;
 
 impl Solution {
     pub fn xor_after_queries(nums: Vec<i32>, queries: Vec<Vec<i32>>) -> i32 {
-        let n = nums.len();
         let mut nums = nums.into_iter().map(|it| it as i64).collect::<Vec<i64>>();
 
         for query in queries {
@@ -23,10 +22,7 @@ impl Solution {
             }
         }
 
-        let mut ans = nums[0];
-        for &num in &nums[1..n] {
-            ans = ans ^ num;
-        }
+        let ans = nums.iter().fold(0, |acc, &n| acc ^ n);
 
         return ans as i32;
     }
