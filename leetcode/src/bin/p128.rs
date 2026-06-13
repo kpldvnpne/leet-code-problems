@@ -12,6 +12,37 @@ impl Solution {
           return 1;
         }
 
+        use std::collections::HashSet;
+        let mut hash_set = HashSet::with_capacity(nums.len());
+        for &num in &nums {
+          hash_set.insert(num);
+        }
+
+        let mut max_consecutive = 1;
+        for &num in hash_set.iter() {
+          if !hash_set.contains(&(num - 1)) {
+            let mut next = num + 1;
+            while hash_set.contains(&next) {
+              next += 1;
+            }
+
+            let consecutive = next - num;
+            max_consecutive = max_consecutive.max(consecutive);
+          }
+        }
+
+        return max_consecutive;
+    }
+
+    pub fn longest_consecutive_v2(nums: Vec<i32>) -> i32 {
+        if nums.len() == 0 {
+          return 0;
+        }
+
+        if nums.len() == 1 {
+          return 1;
+        }
+
         struct Container {
           left: Option<i32>,
           right: Option<i32>,
